@@ -1,0 +1,143 @@
+{% extends 'website/base_listing.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'website/css/post_lists.css' %}">
+{% endblock %}
+{% block title %}All Study Materials - TayariWeb{% endblock %}
+{% block meta_description %}Browse all study materials, notes, and guides for competitive exam preparation on TayariWeb.{% endblock %}
+
+{% block search_url %}{% url 'website:search' %}{% endblock %}
+{% block search_placeholder %}Search materials...{% endblock %}
+
+{% block filter_title %}Categories{% endblock %}
+
+{% block filter_items %}
+<li>
+    <a href="{% url 'website:all_posts' %}" class="filter-link {% if not current_category %}active{% endif %}">
+        All Materials
+        <span class="count">{{ total_posts }}</span>
+    </a>
+</li>
+{% for cat in categories %}
+<li>
+    <a href="?category={{ cat.slug }}" class="filter-link {% if current_category == cat.slug %}active{% endif %}">
+        {{ cat.name }}
+        <span class="count">{{ cat.post_count }}</span>
+    </a>
+</li>
+{% endfor %}
+{% endblock %}
+
+{% block page_title %}All Study Materials{% endblock %}
+{% block page_subtitle %}{{ total_posts }} resources available{% endblock %}
+
+{% block content_description %}
+<p>Access comprehensive study materials for competitive exams including ISSB, CSS, PMS, Medical, and Engineering entrance tests. Our curated collection includes:</p>
+<ul>
+    <li>Previous year solved papers with detailed explanations</li>
+    <li>Subject-wise notes and formula sheets</li>
+    <li>Practice quizzes and mock tests</li>
+    <li>Expert tips and preparation strategies</li>
+</ul>
+<p>Browse by category or use the search to find specific topics. New materials added weekly.</p>
+{% endblock %}
+
+{% block sort_options %}
+<a href="?{% if current_category %}category={{ current_category }}&{% endif %}sort=latest" 
+   class="sort-link {% if current_sort == 'latest' %}active{% endif %}">Latest</a>
+<a href="?{% if current_category %}category={{ current_category }}&{% endif %}sort=popular" 
+   class="sort-link {% if current_sort == 'popular' %}active{% endif %}">Popular</a>
+<a href="?{% if current_category %}category={{ current_category }}&{% endif %}sort=oldest" 
+   class="sort-link {% if current_sort == 'oldest' %}active{% endif %}">Oldest</a>
+{% endblock %}
+
+{% block table_headers %}
+<span>Material Details</span>
+<span>Date</span>
+<span>Category</span>
+{% endblock %}
+
+{% block table_items %}
+{% for post in posts %}
+<article class="blog-list-item" data-post-id="{{ post.id }}">                        
+    <div class="blog-list-content-wrap">
+        <h2 class="blog-list-title">
+            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+        </h2>
+        <p class="blog-list-excerpt">{{ post.excerpt|truncatechars:150 }}</p>
+    </div>
+    
+    <span class="blog-list-date">{{ post.published_at|date:"M d, Y" }}</span>
+    <span class="blog-list-category">{{ post.category.name|default:"General" }}</span>
+</article>
+{% empty %}
+<div class="blog-empty">
+    <p>No materials found.</p>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block load_more %}
+{% if has_more_posts %}
+<div class="load-more-container">
+    <button class="load-more-btn" id="loadMoreBtn" data-next-page="2" data-category="{{ current_category|default:'' }}" data-sort="{{ current_sort }}">
+        Load More Posts
+    </button>
+</div>
+{% endif %}
+
+<script>
+// Load More Posts
+const loadMoreBtn = document.getElementById('loadMoreBtn');
+const itemsList = document.getElementById('itemsList');
+
+if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', function() {
+        const btn = this;
+        const nextPage = btn.dataset.nextPage;
+        const category = btn.dataset.category;
+        const sort = btn.dataset.sort;
+        
+        btn.disabled = true;
+        btn.classList.add('loading');
+        btn.innerHTML = 'Loading...';
+        
+        let url = `?page=${nextPage}`;
+        if (category) url += `&category=${category}`;
+        if (sort && sort !== 'latest') url += `&sort=${sort}`;
+        
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newItems = doc.querySelectorAll('.blog-list-item');
+            
+            newItems.forEach(item => {
+                itemsList.appendChild(item.cloneNode(true));
+            });
+            
+            const hasMore = doc.querySelector('#loadMoreBtn');
+            if (hasMore) {
+                btn.dataset.nextPage = parseInt(nextPage) + 1;
+                btn.disabled = false;
+                btn.classList.remove('loading');
+                btn.innerHTML = 'Load More Posts';
+            } else {
+                btn.remove();
+            }
+        })
+        .catch(error => {
+            console.error('Load more error:', error);
+            btn.disabled = false;
+            btn.classList.remove('loading');
+            btn.innerHTML = 'Load More Posts';
+        });
+    });
+}
+</script>
+{% endblock %}

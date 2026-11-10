@@ -1,0 +1,75 @@
+{% extends 'website/base_listing.html' %}
+{% load static %}
+
+{% block title %}{{ content_type.name }} - TayariWeb{% endblock %}
+
+{% block search_url %}{% url 'website:content_list' content_type.slug %}{% endblock %}
+{% block search_placeholder %}Search {{ content_type.name|lower }}...{% endblock %}
+
+{% block filter_title %}Categories{% endblock %}
+
+{% block filter_items %}
+<li>
+    <a href="{% url 'website:content_list' content_type.slug %}" class="filter-link {% if not current_category %}active{% endif %}">
+        All {{ content_type.name }}s
+        <span class="count">{{ total_items }}</span>
+    </a>
+</li>
+{% for cat in categories %}
+<li>
+    <a href="?category={{ cat.category }}" class="filter-link">
+        {{ cat.category }}
+        <span class="count">{{ cat.count }}</span>
+    </a>
+</li>
+{% endfor %}
+{% endblock %}
+
+{% block page_title %}{{ content_type.name }}s{% endblock %}
+{% block page_subtitle %}{{ total_items }} {{ content_type.name|lower }}s available{% endblock %}
+
+{% block content_description %}
+<p>Browse all {{ content_type.name|lower }}s posted on TayariWeb.</p>
+{% endblock %}
+
+{% block sort_options %}
+<a href="?sort=latest" class="sort-link {% if current_sort == 'latest' %}active{% endif %}">Latest</a>
+<a href="?sort=popular" class="sort-link {% if current_sort == 'popular' %}active{% endif %}">Popular</a>
+{% if content_type.slug in 'job,scholarship' %}
+<a href="?sort=deadline" class="sort-link {% if current_sort == 'deadline' %}active{% endif %}">Deadline</a>
+{% endif %}
+{% endblock %}
+
+{% block table_headers %}
+<span>Details</span>
+<span>Date</span>
+<span>Category</span>
+{% endblock %}
+
+{% block table_items %}
+{% for item in items %}
+<article class="blog-list-item">
+    <span class="blog-list-category">{{ item.display_category }}</span>
+    
+    <div class="blog-list-content-wrap">
+        <h2 class="blog-list-title">
+            <a href="{{ item.get_absolute_url }}">{{ item.title }}</a>
+        </h2>
+        <p class="blog-list-excerpt">{{ item.excerpt|truncatechars:150 }}</p>
+    </div>
+    
+    <span class="blog-list-date">
+        {% if item.deadline %}
+        {{ item.deadline|date:"M d, Y" }}
+        {% else %}
+        {{ item.posted_at|date:"M d, Y" }}
+        {% endif %}
+    </span>
+    <span class="blog-list-category">{{ item.display_organization }}</span>
+</article>
+{% empty %}
+<div class="blog-empty">
+    <p>No {{ content_type.name|lower }}s found.</p>
+</div>
+{% endfor %}
+{% endblock %}

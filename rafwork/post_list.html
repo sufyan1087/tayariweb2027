@@ -1,0 +1,153 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}All Study Materials - TayariWeb{% endblock %}
+{% block meta_description %}Browse all study materials, notes, and guides for competitive exam preparation on TayariWeb.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'website/css/general_post.css' %}">
+{% endblock %}
+{% block content %}
+<div class="blog-page-wrapper">
+    <div class="blog-container">
+        
+        <!-- LEFT SIDEBAR -->
+        <aside class="blog-sidebar blog-sidebar-left">
+            <!-- Categories Filter -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">Categories</h3>
+                <ul class="filter-list">
+                    <li>
+                        <a href="{% url 'website:all_posts' %}" class="filter-link {% if not current_category %}active{% endif %}">
+                            All Materials
+                            <span class="count">{{ total_posts }}</span>
+                        </a>
+                    </li>
+                    {% for cat in categories %}
+                    <li>
+                        <a href="?category={{ cat.slug }}" class="filter-link {% if current_category == cat.slug %}active{% endif %}">
+                            {{ cat.name }}
+                            <span class="count">{{ cat.post_count }}</span>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Ad -->
+            {% if ad_left_1 %}
+            <div class="sidebar-ad">
+                <div class="ad-label">Sponsored</div>
+                {{ ad_left_1.content|safe }}
+            </div>
+            {% endif %}
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="blog-main">
+            
+            <!-- Page Header -->
+            <div class="blog-header">
+                <h1 class="blog-title">All Study Materials</h1>
+                <p class="blog-subtitle">{{ total_posts }} resources available for exam preparation</p>
+            </div>
+
+            <!-- Sort & Filter Bar -->
+            <div class="blog-toolbar">
+                <div class="sort-options">
+                    <span class="sort-label">Sort by:</span>
+                    <a href="?{% if current_category %}category={{ current_category }}&{% endif %}sort=latest" 
+                       class="sort-link {% if current_sort == 'latest' %}active{% endif %}">Latest</a>
+                    <a href="?{% if current_category %}category={{ current_category }}&{% endif %}sort=popular" 
+                       class="sort-link {% if current_sort == 'popular' %}active{% endif %}">Popular</a>
+                    <a href="?{% if current_category %}category={{ current_category }}&{% endif %}sort=oldest" 
+                       class="sort-link {% if current_sort == 'oldest' %}active{% endif %}">Oldest</a>
+                </div>
+            </div>
+
+<!-- Posts List -->
+<div class="blog-list">
+    {% for post in posts %}
+    <article class="blog-list-item">
+        <div class="blog-list-title-wrap">
+            <h2 class="blog-list-title">
+                <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+            </h2>
+            <span class="blog-list-category">{{ post.category.name|default:"General" }}</span>
+        </div>
+        
+        <span class="blog-list-date">{{ post.published_at|date:"M d, Y" }}</span>
+        
+        <span class="blog-list-views">{{ post.views }}</span>
+        
+        <span class="blog-list-author">{{ post.author|default:"TayariWeb" }}</span>
+        
+        <!-- Mobile only meta row -->
+        <div class="blog-list-meta-row">
+            <span>{{ post.published_at|date:"M d, Y" }}</span>
+            <span>{{ post.views }} views</span>
+            <span>{{ post.author|default:"TayariWeb" }}</span>
+        </div>
+    </article>
+    {% empty %}
+    <div class="blog-empty">
+        <p>No materials found.</p>
+    </div>
+    {% endfor %}
+</div>
+<div class="blog-minimal-list">
+    {% for post in posts %}
+    <article class="blog-minimal-item">
+        <span class="blog-minimal-date">{{ post.published_at|date:"M d" }}</span>
+        <h2 class="blog-minimal-title">
+            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+        </h2>
+        <span class="blog-minimal-category">{{ post.category.name|default:"General" }}</span>
+    </article>
+    {% endfor %}
+</div>
+
+            <!-- Pagination -->
+            {% if posts.has_other_pages %}
+            <div class="blog-pagination">
+                {% if posts.has_previous %}
+                <a href="?page={{ posts.previous_page_number }}{% if current_sort != 'latest' %}&sort={{ current_sort }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}" 
+                   class="page-btn">← Previous</a>
+                {% endif %}
+                
+                <span class="page-info">Page {{ posts.number }} of {{ posts.paginator.num_pages }}</span>
+                
+                {% if posts.has_next %}
+                <a href="?page={{ posts.next_page_number }}{% if current_sort != 'latest' %}&sort={{ current_sort }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}" 
+                   class="page-btn">Next →</a>
+                {% endif %}
+            </div>
+            {% endif %}
+
+        </main>
+
+        <!-- RIGHT SIDEBAR -->
+        <aside class="blog-sidebar blog-sidebar-right">
+            <!-- Ad -->
+            {% if ad_right_1 %}
+            <div class="sidebar-ad">
+                <div class="ad-label">Advertisement</div>
+                {{ ad_right_1.content|safe }}
+            </div>
+            {% endif %}
+
+            <!-- Quick Links -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">Quick Access</h3>
+                <ul class="quick-links">
+                    <li><a href="{% url 'quiz:quiz_list' %}">Practice Tests</a></li>
+                    <li><a href="#">Exam Schedules</a></li>
+                    <li><a href="#">Scholarships</a></li>
+                    <li><a href="#">Results</a></li>
+                </ul>
+            </div>
+        </aside>
+
+    </div>
+</div>
+{% endblock %}

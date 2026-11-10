@@ -1,0 +1,109 @@
+/* CKEditor 5 Width Fix - FORCE OVERRIDE */
+/* Use !important everywhere to override defaults */
+
+/* Main wrapper */
+.django-ckeditor-widget,
+div.django-ckeditor-widget,
+form .django-ckeditor-widget,
+.form-row .django-ckeditor-widget {
+    display: block !important;
+    width: 100% !important;
+    max-width: 800px !important;  /* Fixed max width */
+    min-width: auto !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+/* CKEditor main container */
+.ck.ck-editor,
+.ck-editor,
+div.ck-editor {
+    max-width: 800px !important;
+    width: 100% !important;
+    display: block !important;
+}
+
+/* Editable area - THIS IS THE KEY */
+.ck-editor__editable,
+.ck.ck-editor__editable,
+.ck.ck-editor__editable_inline,
+div.ck-editor__editable {
+    max-width: 800px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: pre-wrap !important;
+}
+
+/* Toolbar */
+.ck.ck-toolbar {
+    max-width: 800px !important;
+    width: 100% !important;
+    flex-wrap: wrap !important;
+}
+
+/* Content wrapper */
+.ck.ck-editor__main,
+.ck-editor__main {
+    max-width: 800px !important;
+    width: 100% !important;
+}
+
+/* Text content */
+.ck.ck-content,
+.ck-content {
+    max-width: 100% !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: pre-wrap !important;
+}
+
+/* Django admin specific fixes */
+fieldset.module .django-ckeditor-widget,
+.form-row.field-content .django-ckeditor-widget,
+.form-row.field-bio .django-ckeditor-widget,
+.form-row.field-eligibility_criteria .django-ckeditor-widget,
+.form-row.field-requirements .django-ckeditor-widget,
+.form-row.field-benefits .django-ckeditor-widget,
+.form-row.field-how_to_apply .django-ckeditor-widget,
+.form-row.field-benefits_details .django-ckeditor-widget,
+.form-row.field-required_documents .django-ckeditor-widget,
+.form-row.field-selection_process .django-ckeditor-widget,
+.form-row.field-syllabus_overview .django-ckeditor-widget,
+.form-row.field-prerequisites .django-ckeditor-widget,
+.form-row.field-skills_gained .django-ckeditor-widget,
+.form-row.field-description .django-ckeditor-widget {
+    max-width: calc(100% - 160px) !important;
+    width: calc(100% - 160px) !important;
+    margin-left: 160px !important;
+    display: block !important;
+}
+
+/* For collapsed fieldsets */
+fieldset.collapse .django-ckeditor-widget,
+fieldset.collapsed .django-ckeditor-widget {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+}
+
+/* Inline styles override */
+[style*="width: 100%"].django-ckeditor-widget,
+[style*="width:100%"].django-ckeditor-widget {
+    max-width: 800px !important;
+}
+
+/* Mobile */
+@media screen and (max-width: 767px) {
+    .django-ckeditor-widget,
+    .ck.ck-editor,
+    .ck-editor__editable,
+    fieldset.module .django-ckeditor-widget,
+    .form-row .django-ckeditor-widget {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+}

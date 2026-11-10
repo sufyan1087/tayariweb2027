@@ -1,0 +1,157 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+  <!-- Performance: Preconnect & DNS Prefetch -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com">
+  <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net">
+  
+  <!-- SEO Meta -->
+  <title>{% block title %}TayariWeb - CSS, PMS, ISSB Exam Preparation & Jobs{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Pakistan's #1 platform for CSS, PMS, ISSB exam preparation. Find government jobs, scholarships, free courses, and practice quizzes.{% endblock %}">
+  <meta name="keywords" content="{% block meta_keywords %}CSS Pakistan, PMS exam, ISSB test, government jobs Pakistan, scholarships, free courses, exam preparation{% endblock %}">
+  <meta name="author" content="TayariWeb">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  
+  <!-- Canonical -->
+  <link rel="canonical" href="{% block canonical %}{{ request.build_absolute_uri }}{% endblock %}">
+  
+  <!-- Open Graph -->
+  <meta property="og:locale" content="en_PK">
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:title" content="{% block og_title %}TayariWeb - CSS, PMS, ISSB Exam Preparation & Jobs{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Pakistan's #1 platform for CSS, PMS, ISSB exam preparation.{% endblock %}">
+  <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}">
+  <meta property="og:site_name" content="TayariWeb">
+  <meta property="og:image" content="{% block og_image %}{% static 'website/images/og-default.jpg' %}{% endblock %}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% block twitter_title %}TayariWeb{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}Pakistan's #1 platform for CSS, PMS, ISSB exam preparation.{% endblock %}">
+  <meta name="twitter:image" content="{% block twitter_image %}{% static 'website/images/og-default.jpg' %}{% endblock %}">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="{% static 'website/images/favicon.ico' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'website/images/apple-touch-icon.png' %}">
+  
+  <!-- Fonts: Async Load with Font Display Swap -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" as="style">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'; this.onload=null;">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"></noscript>
+  
+  <!-- Critical CSS: Layout & Anti-Flash -->
+  <style>
+    :root{
+      --color-primary:#563d7c;
+      --color-primary-dark:#322348;
+      --color-accent-gold:#fbbf24;
+      --color-accent-purple:#8b5cf6;
+      --navbar-height:44px;
+      --mobile-navbar-height:56px;
+      --container-max:1400px;
+      --z-sticky:100;
+      --z-mobile-menu:200;
+      --transition-fast:150ms ease;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{font-size:15px;scroll-behavior:smooth}
+    body{font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;color:#1f1f1f;background:#f8f7fa;min-height:100vh}
+    .skip-link{position:absolute;top:-40px;left:0;background:var(--color-primary);color:#fff;padding:8px 16px;z-index:100000;transition:top .3s;text-decoration:none;font-weight:600;border-radius:0 0 4px 0}
+    .skip-link:focus{top:0;left:0}
+    .visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    
+    /* Mobile Ad: Hidden by default, only show on mobile */
+    .tw-mobile-sticky-ad{display:none!important}
+    @media (max-width:768px){
+      .tw-mobile-sticky-ad{display:block!important;position:fixed;bottom:0;left:0;right:0;z-index:90;background:#fff;border-top:1px solid #e5e7eb;padding:8px;text-align:center;min-height:100px}
+      body{padding-bottom:116px}
+    }
+    
+    /* Reduced motion */
+    @media (prefers-reduced-motion:reduce){
+      *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}
+      html{scroll-behavior:auto}
+    }
+
+    
+  </style>
+  !-- Main CSS: Deferred -->
+<!-- Main CSS: Load Normally (No Deferred Tricks) -->
+<link rel="stylesheet" href="{% static 'website/css/navbar.css' %}">
+<link rel="stylesheet" href="{% static 'website/css/main.css' %}">
+
+  {% block extra_css %}{% endblock %}
+  
+  <!-- Schema.org: Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    "name": "TayariWeb",
+    "url": "https://tayariweb.com",
+    "logo": "{% static 'website/images/logo.png' %}",
+    "description": "Pakistan's leading platform for CSS, PMS, ISSB exam preparation and government job alerts",
+    "sameAs": [
+      "https://facebook.com/tayariweb",
+      "https://twitter.com/tayariweb",
+      "https://youtube.com/tayariweb"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "email": "support@tayariweb.com"
+    }
+  }
+  </script>
+  
+  {% block schema_org %}{% endblock %}
+</head>
+
+<body class="{% block body_class %}{% endblock %}" id="top">
+  <!-- Skip Navigation -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  
+  <!-- Header -->
+  {% include 'website/components/header.html' %}
+  
+  <!-- Main Content -->
+  <main id="main-content" class="main-wrapper" role="main" tabindex="-1">
+    {% block content %}{% endblock %}
+  </main>
+  
+  <!-- Footer -->
+  {% include 'website/components/footer.html' %}
+  
+  <!-- Mobile Sticky Ad: Only visible on mobile via CSS -->
+  {% block mobile_sticky_ad %}
+  <div class="tw-mobile-sticky-ad" role="complementary" aria-label="Advertisement">
+    {% include 'website/components/ads/ad_unit.html' with type="mobile_sticky_320x100" %}
+  </div>
+  {% endblock %}
+  
+  <!-- Deferred Scripts -->
+   <script src="{% static 'website/js/navbar.js' %}" defer></script>
+  
+  {% block extra_js %}{% endblock %}
+  
+  <!-- PWA Service Worker -->
+  <script>
+    if('serviceWorker' in navigator){
+      window.addEventListener('load',function(){
+        navigator.serviceWorker.register('{% static "website/js/sw.js" %}')
+          .then(function(r){console.log('SW registered:',r.scope)})
+          .catch(function(e){console.log('SW failed:',e)});
+      });
+    }
+  </script>
+</body>
+</html>

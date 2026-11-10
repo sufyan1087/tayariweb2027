@@ -1,0 +1,267 @@
+{% extends 'website/dynamic/base.html' %}
+{% load static %}
+
+{% block seo_meta %}
+{% include 'website/components/seo_meta.html' with 
+    page_title="Custom Quiz Generator - TayariWeb"
+    meta_description="Create personalized practice quizzes for CSS, ISSB, PMS, and competitive exams with exam simulation mode."
+    meta_keywords="CSS quiz, ISSB preparation, PMS practice, competitive exam quiz, Pakistan exam preparation"
+    canonical_url=request.build_absolute_uri
+    og_type="website"
+    og_title="Custom Quiz Generator - TayariWeb"
+    og_description="Create personalized practice quizzes for CSS, ISSB, PMS, and competitive exams with exam simulation mode."
+    og_image=""
+%}
+{% endblock %}
+
+{% block schema_org %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "name": "Custom Quiz Generator - TayariWeb",
+  "description": "Create personalized practice quizzes for CSS, ISSB, PMS, and competitive exams",
+  "provider": {
+    "@type": "Organization",
+    "name": "TayariWeb",
+    "url": "https://tayariweb.com"
+  },
+  "educationalLevel": ["CSS", "PMS", "ISSB", "Competitive Exams"],
+  "learningResourceType": "Quiz",
+  "interactivityType": "active"
+}
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'custom_quiz/css/quiz_styles.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Top Advertisement -->
+<section class="ad-section ad-horizontal ad-section-top" aria-label="Advertisement">
+    {% include 'website/components/ads/ad_unit.html' with type="horizontal_banner" %}
+</section>
+
+<div id="quiz-page-wrapper" class="quiz-page-wrapper" data-phase="config" role="main" aria-label="Custom Quiz Generator">
+    <div class="quiz-content-grid">
+        
+        <!-- Main Content Column -->
+        <div class="quiz-main-column">
+            
+            <!-- Hero / Intro Content -->
+            <section class="content-hero phase-config-only" aria-labelledby="quiz-heading">
+                <header class="content-header">
+                    <h1 id="quiz-heading">Create Your Perfect Quiz</h1>
+                    <p class="content-lead">
+                        Customize your practice session with targeted questions, timed simulations, and detailed analytics. 
+                        Select your exam category, configure difficulty, and start practicing in under 60 seconds.
+                    </p>
+                </header>
+                
+                <div class="feature-strip" role="list" aria-label="Quiz features">
+                    <div class="feature-pill" role="listitem">
+                        <span class="feature-icon" aria-hidden="true">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                        </span>
+                        <span>Timed Practice</span>
+                    </div>
+                    <div class="feature-pill" role="listitem">
+                        <span class="feature-icon" aria-hidden="true">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                            </svg>
+                        </span>
+                        <span>Targeted Questions</span>
+                    </div>
+                    <div class="feature-pill" role="listitem">
+                        <span class="feature-icon" aria-hidden="true">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                        </span>
+                        <span>Exam Simulation</span>
+                    </div>
+                    <div class="feature-pill" role="listitem">
+                        <span class="feature-icon" aria-hidden="true">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
+                                <path d="M22 12A10 10 0 0 0 9 3.65"/>
+                            </svg>
+                        </span>
+                        <span>Instant Analytics</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- How It Works -->
+            <section class="content-section how-it-works phase-config-only" aria-label="How it works">
+                <h2 class="section-title">How It Works</h2>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <span class="step-number">1</span>
+                        <h3 class="step-title">Select Category</h3>
+                        <p class="step-desc">Choose from CSS, PMS, ISSB, or general knowledge categories with 5000+ verified questions.</p>
+                    </div>
+                    <div class="step-card">
+                        <span class="step-number">2</span>
+                        <h3 class="step-title">Configure Settings</h3>
+                        <p class="step-desc">Set question count, time limit, difficulty distribution, and exam mode preferences.</p>
+                    </div>
+                    <div class="step-card">
+                        <span class="step-number">3</span>
+                        <h3 class="step-title">Practice & Improve</h3>
+                        <p class="step-desc">Take the quiz, review detailed explanations, and track your progress over time.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- React Mount Point — Quiz Configuration Form -->
+            <div class="react-mount-wrapper">
+                <div
+                    id="custom-quiz-root"
+                    data-page="config"
+                    data-config-path="{% url 'custom_quiz:generator' %}"
+                    data-take-path="{% url 'custom_quiz:generator' %}"
+                ></div>
+            </div>
+
+            <!-- Mid-Content Advertisement -->
+            <section class="ad-section ad-in-article phase-config-only" aria-label="Advertisement">
+                {% include 'website/components/ads/ad_unit.html' with type="in_article_fluid" %}
+            </section>
+
+            <!-- Pro Tips Content -->
+            <section class="content-section pro-tips phase-config-only" aria-label="Pro tips">
+                <h2 class="section-title">Pro Tips for Best Results</h2>
+                <div class="tips-list">
+                    <div class="tip-row">
+                        <span class="tip-marker" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </span>
+                        <div class="tip-content">
+                            <strong>Exam Mode</strong> simulates real test conditions with no instant feedback. Use this 2 weeks before your actual exam.
+                        </div>
+                    </div>
+                    <div class="tip-row">
+                        <span class="tip-marker" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </span>
+                        <div class="tip-content">
+                            <strong>45 minutes</strong> is the standard duration for PMS screening tests. Match this for realistic practice.
+                        </div>
+                    </div>
+                    <div class="tip-row">
+                        <span class="tip-marker" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </span>
+                        <div class="tip-content">
+                            <strong>Balanced difficulty</strong> (33% easy, 33% medium, 34% hard) is recommended for most students starting out.
+                        </div>
+                    </div>
+                    <div class="tip-row">
+                        <span class="tip-marker" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </span>
+                        <div class="tip-content">
+                            <strong>Negative marking</strong> (−0.25 per wrong answer) trains you to avoid guessing. Enable it for CSS/PMS prep.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div><!-- /.quiz-main-column -->
+
+        <!-- Sidebar Column — shows widgets on config page, ad only on runner/results -->
+        <aside class="quiz-sidebar" role="complementary" aria-label="Quiz sidebar">
+            
+            <!-- Sidebar Ad (always visible) -->
+            <section class="ad-section ad-sidebar-large" aria-label="Advertisement">
+                {% include 'website/components/ads/ad_unit.html' with type="sidebar_300x600" %}
+            </section>
+
+            <!-- Live Stats Widget -->
+            <div class="sidebar-widget stats-widget phase-config-only">
+                <h4 class="widget-title">Platform Stats</h4>
+                <div class="stat-row">
+                    <span class="stat-big">5000+</span>
+                    <span class="stat-label">Total Questions</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-big">{{ quizzes_taken_today }}</span>
+                    <span class="stat-label">Quizzes Today</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-big">50+</span>
+                    <span class="stat-label">Active Now</span>
+                </div>
+            </div>
+
+            <!-- Popular Categories -->
+            <div class="sidebar-widget categories-widget phase-config-only">
+                <h4 class="widget-title">Popular Categories</h4>
+                <ul class="category-list">
+                    {% for cat in popular_categories|default:"" %}
+                    <li>
+                        <a href="{% url 'custom_quiz:generator_by_slug' slug=cat.slug %}" class="category-link">
+                            <span class="cat-name">{{ cat.name }}</span>
+                            <span class="cat-count">{{ cat.total_questions|default:"0" }}</span>
+                        </a>
+                    </li>
+                    {% empty %}
+                    <li><a href="{% url 'custom_quiz:generator_by_slug' slug='css' %}" class="category-link"><span class="cat-name">CSS Preparation</span><span class="cat-count">1200</span></a></li>
+                    <li><a href="{% url 'custom_quiz:generator_by_slug' slug='pms' %}" class="category-link"><span class="cat-name">PMS Screening</span><span class="cat-count">800</span></a></li>
+                    <li><a href="{% url 'custom_quiz:generator_by_slug' slug='issb' %}" class="category-link"><span class="cat-name">ISSB Intelligence</span><span class="cat-count">600</span></a></li>
+                    <li><a href="{% url 'custom_quiz:generator_by_slug' slug='general' %}" class="category-link"><span class="cat-name">General Knowledge</span><span class="cat-count">1500</span></a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Quick Tips Widget -->
+            <div class="sidebar-widget tips-widget phase-config-only">
+                <h4 class="widget-title">Why Custom Quiz?</h4>
+                <div class="tip-block">
+                    <p>Target weak areas with specific topics. Track improvement over time. Simulate exact exam conditions.</p>
+                </div>
+            </div>
+
+        </aside><!-- /.quiz-sidebar -->
+
+    </div><!-- /.quiz-content-grid -->
+</div><!-- /.quiz-page-wrapper -->
+
+<!-- Mobile Sticky Ad -->
+<section class="ad-section ad-mobile-sticky" aria-label="Advertisement">
+    {% include 'website/components/ads/ad_unit.html' with type="mobile_sticky_320x100" %}
+</section>
+
+<!-- Aria live regions for screen reader announcements -->
+<div id="aria-live-polite" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+<div id="aria-live-assertive" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
+
+<script>
+    window.CATEGORY_DATA = {{ categories_json|safe }};
+    window.QUIZ_API_URLS = {
+        checkAvailability: "{% url 'custom_quiz:check_availability' %}",
+        generate: "{% url 'custom_quiz:generate_quiz' %}",
+        topics: "{% url 'custom_quiz:get_topics' %}"
+    };
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script type="module" src="{% static 'js/bundles/custom-quiz.js' %}"></script>
+{% endblock %}

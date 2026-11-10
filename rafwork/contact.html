@@ -1,0 +1,14 @@
+{% extends 'website/base.html' %}
+
+{% block title %}Contact - TayariWeb{% endblock %}
+
+{% block content %}
+<div class="contact-page">
+    <h1>Contact Us</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Send Message</button>
+    </form>
+</div>
+{% endblock %}

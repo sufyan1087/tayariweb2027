@@ -1,0 +1,208 @@
+{% extends 'website/dynamic/base.html' %}
+{% load static %}
+
+{% block seo_meta %}
+{% include 'website/components/seo_meta.html' with 
+    page_title="Custom Quiz - TayariWeb"
+    meta_description="Take your personalized practice quiz for CSS, ISSB, PMS, and competitive exams with real-time scoring and analytics."
+    meta_keywords="CSS quiz, ISSB preparation, PMS practice, competitive exam quiz, Pakistan exam preparation"
+    canonical_url=request.build_absolute_uri
+    og_type="website"
+    og_title="Custom Quiz - TayariWeb"
+    og_description="Take your personalized practice quiz for CSS, ISSB, PMS, and competitive exams."
+    og_image=""
+%}
+{% endblock %}
+
+{% block schema_org %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "name": "Custom Quiz - TayariWeb",
+  "description": "Personalized practice quiz for competitive exam preparation",
+  "provider": {
+    "@type": "Organization",
+    "name": "TayariWeb",
+    "url": "https://tayariweb.com"
+  },
+  "educationalLevel": ["CSS", "PMS", "ISSB", "Competitive Exams"],
+  "learningResourceType": "Quiz",
+  "interactivityType": "active"
+}
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'custom_quiz/css/quiz_styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Top Advertisement -->
+<section class="ad-section ad-horizontal ad-section-top" aria-label="Advertisement">
+    {% include 'website/components/ads/ad_unit.html' with type="horizontal_banner" %}
+</section>
+
+<div id="quiz-page-wrapper" class="quiz-page-wrapper" data-phase="running" role="main" aria-label="Custom Quiz">
+    <div class="quiz-content-grid">
+        
+        <!-- Main Content Column -->
+        <div class="quiz-main-column">
+            
+            <!-- React Mount Point - Quiz Runner & Results -->
+            <div class="react-mount-wrapper runner-mount">
+                <div 
+                    id="custom-quiz-root"
+                    data-page="take"
+                    data-config-path="{% url 'custom_quiz:generator' %}"
+                    data-take-path="{% url 'custom_quiz:generator' %}"
+                    data-educational-content="{{ page_content.main_content|default:''|escapejs }}"
+                ></div>
+            </div>
+
+            <!-- Content Section Below Quiz (ONLY visible during RUNNING phase) -->
+            <section class="content-below-quiz phase-running-only" id="contentBelowQuiz" aria-label="Additional resources">
+                
+                <!-- Dynamic Educational Content from Django -->
+                {% if page_content and page_content.main_content %}
+                <article class="educational-article" aria-label="Study material">
+                    <h2 class="section-title">{{ page_content.content_title|default:"Study Material" }}</h2>
+                    <div class="article-body richtext-content">
+                        {{ page_content.main_content|safe }}
+                    </div>
+                </article>
+                {% endif %}
+
+                <!-- Resource Grid -->
+                <div class="resource-grid">
+                    <article class="resource-card">
+                        <h3 class="resource-title">Study Materials</h3>
+                        <p class="resource-desc">Access comprehensive notes, past papers, and solved guides for CSS, PMS, and ISSB preparation.</p>
+                        <a href="{% url 'website:home' %}" class="resource-link">Browse Materials</a>
+                    </article>
+                    <article class="resource-card">
+                        <h3 class="resource-title">Daily Current Affairs</h3>
+                        <p class="resource-desc">Stay updated with Pakistan and international news relevant to competitive exams.</p>
+                        <a href="{% url 'website:home' %}" class="resource-link">Read Today</a>
+                    </article>
+                    <article class="resource-card">
+                        <h3 class="resource-title">Job Alerts</h3>
+                        <p class="resource-desc">Never miss government and private sector opportunities with our daily job updates.</p>
+                        <a href="{% url 'website:jobs_list' %}" class="resource-link">View Jobs</a>
+                    </article>
+                    <article class="resource-card">
+                        <h3 class="resource-title">Scholarships</h3>
+                        <p class="resource-desc">Find fully-funded and partial scholarships for Pakistani students worldwide.</p>
+                        <a href="{% url 'website:scholarships_list' %}" class="resource-link">Explore</a>
+                    </article>
+                </div>
+
+                <!-- Study Strategy Content -->
+                <div class="strategy-block">
+                    <h3 class="strategy-title">Effective Study Strategy</h3>
+                    <div class="strategy-list">
+                        <div class="strategy-item">
+                            <span class="strategy-num">01</span>
+                            <div class="strategy-content">
+                                <strong>Spaced Repetition</strong>
+                                <span>Revisit difficult topics every 3 days for long-term retention.</span>
+                            </div>
+                        </div>
+                        <div class="strategy-item">
+                            <span class="strategy-num">02</span>
+                            <div class="strategy-content">
+                                <strong>Mock Exam Schedule</strong>
+                                <span>Take full-length mock tests every Saturday under timed conditions.</span>
+                            </div>
+                        </div>
+                        <div class="strategy-item">
+                            <span class="strategy-num">03</span>
+                            <div class="strategy-content">
+                                <strong>Error Log</strong>
+                                <span>Maintain a notebook of all wrong answers with explanations.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Mid-Ad (moved outside content section so it can show on results independently) -->
+            <section class="ad-section ad-in-article results-mid-ad phase-results-only" id="resultsMidAd" aria-label="Advertisement">
+                {% include 'website/components/ads/ad_unit.html' with type="in_article_fluid" %}
+            </section>
+
+        </div>
+
+        <!-- Sidebar Column - STICKY on desktop, ad always visible, widgets phase-controlled -->
+        <aside class="quiz-sidebar sidebar-sticky" role="complementary" aria-label="Quiz sidebar">
+            
+            <!-- Sidebar Timer Widget (Runner only) -->
+            <div class="sidebar-widget timer-widget phase-running-only" id="sidebarTimer">
+                <h4 class="widget-title">Time Remaining</h4>
+                <div class="timer-display">--:--</div>
+                <div class="timer-label">No time limit</div>
+            </div>
+
+            <!-- Sidebar Progress Widget (Runner only) -->
+            <div class="sidebar-widget progress-widget phase-running-only" id="sidebarProgress">
+                <h4 class="widget-title">Progress</h4>
+                <span class="progress-text">0 / 0 answered</span>
+                <div class="progress-bar-mini">
+                    <div class="progress-fill-mini" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Sidebar Ad (Always visible) -->
+            <section class="ad-section ad-sidebar-large" aria-label="Advertisement">
+                {% include 'website/components/ads/ad_unit.html' with type="sidebar_300x600" %}
+            </section>
+
+            <!-- Related Quizzes Widget (Results only) -->
+            <div class="sidebar-widget related-widget phase-results-only" id="sidebarRelated">
+                <h4 class="widget-title">Related Quizzes</h4>
+                <div class="related-list" id="relatedList"></div>
+            </div>
+
+            <!-- Lifetime Stats Widget (Results only) -->
+            <div class="sidebar-widget lifetime-widget phase-results-only" id="sidebarLifetime">
+                <h4 class="widget-title">Your Stats</h4>
+                <div class="lifetime-stats">
+                    <div class="lt-stat">
+                        <span class="lt-value" id="ltAttempts">0</span>
+                        <span class="lt-label">Attempts</span>
+                    </div>
+                    <div class="lt-stat">
+                        <span class="lt-value" id="ltAvg">0%</span>
+                        <span class="lt-label">Avg Score</span>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+    </div>
+</div>
+
+<!-- Mobile Sticky Ad -->
+<section class="ad-section ad-mobile-sticky" aria-label="Advertisement">
+    {% include 'website/components/ads/ad_unit.html' with type="mobile_sticky_320x100" %}
+</section>
+
+<!-- Pre-rendered aria-live regions -->
+<div id="aria-live-polite" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+<div id="aria-live-assertive" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
+
+<!-- Data Initialization -->
+<script>
+    window.CATEGORY_DATA = {{ categories_json|safe }};
+    window.QUIZ_API_URLS = {
+        checkAvailability: "{% url 'custom_quiz:check_availability' %}",
+        generate: "{% url 'custom_quiz:generate_quiz' %}",
+        topics: "{% url 'custom_quiz:get_topics' %}"
+    };
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script type="module" src="{% static 'js/bundles/custom-quiz.js' %}"></script>
+{% endblock %}

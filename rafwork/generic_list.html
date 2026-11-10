@@ -1,0 +1,267 @@
+{% extends 'website/base_listing.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'website/css/post_lists.css' %}">
+{% endblock %}
+{% block title %}{{ page_title|default:"Content" }} - TayariWeb{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Browse latest opportunities" }}{% endblock %}
+{% block canonical_url %}{{ seo.canonical_url }}{% endblock %}
+
+{% block extra_head %}
+<!-- Open Graph -->
+<meta property="og:type" content="{{ seo.og_type }}">
+<meta property="og:title" content="{{ seo.og_title }} - TayariWeb">
+<meta property="og:description" content="{{ seo.og_description }}">
+<meta property="og:url" content="{{ seo.canonical_url }}">
+<meta property="og:site_name" content="TayariWeb">
+
+<!-- Structured Data - ItemList -->
+<script type="application/ld+json">
+{{ seo.structured_data|json_script:"structured-data"|safe }}
+</script>
+
+<!-- Structured Data - BreadcrumbList -->
+<script type="application/ld+json">
+{{ breadcrumb_json|json_script:"breadcrumb-data"|safe }}
+</script>
+{% endblock %}
+
+{% block search_url %}{{ search_url|default:"/search/" }}{% endblock %}
+{% block search_placeholder %}{{ search_placeholder|default:"Search..." }}{% endblock %}
+
+{% block filter_title %}{{ filter_title|default:"Categories" }}{% endblock %}
+
+{% block filter_items %}
+<li>
+    <a href="{{ base_url }}" class="filter-link {% if not current_category %}active{% endif %}">
+        All {{ content_type_plural|default:"Items" }}
+        <span class="count">{{ total_items }}</span>
+    </a>
+</li>
+{% for cat in categories %}
+<li>
+    <a href="?category={{ cat.slug }}{% if current_sort and current_sort != default_sort %}&sort={{ current_sort }}{% endif %}" 
+       class="filter-link {% if current_category == cat.slug %}active{% endif %}"
+       title="Browse {{ cat.item_count }} {{ content_type_plural|lower }} in {{ cat.name }}">
+        {{ cat.name }}
+        <span class="count">{{ cat.item_count }}</span>
+    </a>
+</li>
+{% empty %}
+<li class="filter-empty">No categories available</li>
+{% endfor %}
+{% endblock %}
+
+{% block sidebar_ad %}
+<!-- AdSense Sticky Sidebar - 300x600 -->
+<div class="sidebar-ad sticky-ad">
+    <span class="ad-label">Sponsored</span>
+    <div class="ad-placeholder" data-ad-slot="sidebar-sticky" data-ad-format="300x600">
+        <!-- AdSense code here -->
+    </div>
+</div>
+{% endblock %}
+
+{% block page_title %}{{ page_title|default:"Browse Content" }}{% endblock %}
+{% block page_subtitle %}{{ total_items }} {{ content_type_plural|lower|default:"items" }} available{% endblock %}
+
+{% block content_description %}
+{% if description_html %}
+<div class="content-description" itemprop="description">
+    {{ description_html|safe }}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block sort_options %}
+<div class="sort-wrapper" role="group" aria-label="Sort options">
+    <span class="sort-label">Sort by:</span>
+    {% for sort_option in sort_options %}
+    <a href="?{% if current_category %}category={{ current_category }}&{% endif %}sort={{ sort_option.value }}" 
+       class="sort-link {% if current_sort == sort_option.value %}active{% endif %}"
+       aria-label="Sort by {{ sort_option.label }}"
+       {% if current_sort == sort_option.value %}aria-current="true"{% endif %}>
+       {{ sort_option.label }}
+    </a>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block table_headers %}
+{% for header in table_headers %}
+<span role="columnheader">{{ header }}</span>
+{% endfor %}
+{% endblock %}
+
+{% block in_feed_ad %}
+<!-- In-Feed Native Ad - Between items 4-5 -->
+<div class="ad-in-feed" role="complementary" aria-label="Advertisement">
+    <span class="ad-label">Sponsored</span>
+    <div class="ad-content" data-ad-slot="in-feed" data-ad-format="fluid">
+        <!-- AdSense native ad code -->
+    </div>
+</div>
+{% endblock %}
+
+{% block table_items %}
+{% for item in items %}
+<article class="blog-list-item" data-id="{{ item.id }}" itemscope itemtype="https://schema.org/{{ content_type|title }}">
+    <meta itemprop="position" content="{{ forloop.counter }}">
+    
+    <div class="blog-list-content-wrap">
+        <h2 class="blog-list-title" itemprop="headline">
+            <a href="{{ item.get_absolute_url }}" itemprop="url">
+                {{ item.title }}
+            </a>
+        </h2>
+        <p class="blog-list-excerpt" itemprop="description">
+            {{ item.excerpt|truncatechars:120 }}
+            {% if item.is_expiring_soon %}
+            <span class="urgent-badge" itemprop="availabilityEnds">URGENT</span>
+            {% endif %}
+        </p>
+    </div>
+    
+    {% for field in item.display_fields %}
+    <span class="blog-list-{{ field.class }}" {% if field.style %}style="{{ field.style }}"{% endif %}>
+        {{ field.value }}
+    </span>
+    {% endfor %}
+</article>
+
+{% if forloop.counter == 4 %}
+    {# Insert in-feed ad after 4th item #}
+    {{ block.super.in_feed_ad }}
+{% endif %}
+
+{% empty %}
+<div class="blog-empty" role="status">
+    <p>No {{ content_type_plural|lower|default:"items" }} found matching your criteria.</p>
+    <a href="{{ base_url }}" class="btn-clear">Clear filters</a>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block load_more %}
+{% if has_more %}
+<div class="load-more-container">
+    <button class="load-more-btn" 
+            id="loadMoreBtn" 
+            data-next-page="2" 
+            data-category="{{ current_category|default:'' }}" 
+            data-sort="{{ current_sort }}"
+            data-content-type="{{ content_type }}"
+            aria-label="Load more {{ content_type_plural|lower }}">
+        <span class="btn-text">Load More {{ content_type_plural|default:"Items" }}</span>
+        <span class="btn-loader" aria-hidden="true"></span>
+    </button>
+</div>
+
+<script>
+(function() {
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const itemsList = document.getElementById('itemsList');
+    
+    if (!loadMoreBtn || !itemsList) return;
+    
+    loadMoreBtn.addEventListener('click', async function() {
+        const btn = this;
+        const nextPage = btn.dataset.nextPage;
+        const category = btn.dataset.category;
+        const sort = btn.dataset.sort;
+        
+        // Disable and show loading state
+        btn.disabled = true;
+        btn.classList.add('loading');
+        
+        // Build URL with params
+        const params = new URLSearchParams();
+        params.append('page', nextPage);
+        if (category) params.append('category', category);
+        if (sort && sort !== '{{ default_sort }}') params.append('sort', sort);
+        
+        try {
+            const response = await fetch(`?${params.toString()}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'text/html'
+                },
+                cache: 'no-store'
+            });
+            
+            if (!response.ok) throw new Error('Network response was not ok');
+            
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newItems = doc.querySelectorAll('.blog-list-item');
+            
+            if (newItems.length === 0) {
+                btn.remove();
+                return;
+            }
+            
+            // Append new items with animation
+            newItems.forEach((item, index) => {
+                const clone = item.cloneNode(true);
+                clone.style.opacity = '0';
+                clone.style.transform = 'translateY(20px)';
+                itemsList.appendChild(clone);
+                
+                // Staggered fade in
+                setTimeout(() => {
+                    clone.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    clone.style.opacity = '1';
+                    clone.style.transform = 'translateY(0)';
+                }, index * 50);
+            });
+            
+            // Check for more pages
+            const hasMoreBtn = doc.querySelector('#loadMoreBtn');
+            if (hasMoreBtn) {
+                btn.dataset.nextPage = parseInt(nextPage) + 1;
+                btn.disabled = false;
+                btn.classList.remove('loading');
+            } else {
+                btn.remove();
+            }
+            
+            // Refresh AdSense ads if present
+            if (typeof adsbygoogle !== 'undefined') {
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            }
+            
+        } catch (error) {
+            console.error('Load more failed:', error);
+            btn.disabled = false;
+            btn.classList.remove('loading');
+            btn.querySelector('.btn-text').textContent = 'Error - Try Again';
+        }
+    });
+})();
+</script>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<!-- AdSense Lazy Loading -->
+<script>
+// Lazy load ads when they enter viewport
+const adObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const adContainer = entry.target;
+            // Load AdSense ad here
+            if (typeof adsbygoogle !== 'undefined') {
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            }
+            adObserver.unobserve(adContainer);
+        }
+    });
+}, { rootMargin: '100px' });
+
+document.querySelectorAll('.ad-placeholder').forEach(ad => {
+    adObserver.observe(ad);
+});
+</script>
+{% endblock %}

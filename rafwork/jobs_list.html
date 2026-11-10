@@ -1,0 +1,148 @@
+{% extends 'website/base_listing.html' %}
+{% load static %}
+
+{% block title %}Latest Jobs - TayariWeb{% endblock %}
+{% block meta_description %}Find latest government jobs, private sector jobs, and career opportunities. Apply online for ISSB, CSS, PMS, Banking, and other competitive positions.{% endblock %}
+
+{% block search_url %}{% url 'website:jobs_search' %}{% endblock %}
+{% block search_placeholder %}Search jobs...{% endblock %}
+
+{% block filter_title %}Job Categories{% endblock %}
+
+{% block filter_items %}
+<li>
+    <a href="{% url 'website:jobs_list' %}" class="filter-link {% if not current_category %}active{% endif %}">
+        All Jobs
+        <span class="count">{{ total_jobs }}</span>
+    </a>
+</li>
+{% for cat in job_categories %}
+<li>
+    <a href="?category={{ cat.slug }}" class="filter-link {% if current_category == cat.slug %}active{% endif %}">
+        {{ cat.name }}
+        <span class="count">{{ cat.job_count }}</span>
+    </a>
+</li>
+{% endfor %}
+{% endblock %}
+
+{% block page_title %}Latest Jobs & Careers{% endblock %}
+{% block page_subtitle %}{{ total_jobs }} active job postings{% endblock %}
+
+{% block content_description %}
+<p>Find your dream career with TayariWeb. We curate the best opportunities from government and private sectors including:</p>
+<ul>
+    <li>Federal and Provincial Government Jobs</li>
+    <li>Armed Forces (Army, Navy, Air Force)</li>
+    <li>Banking and Financial Sector</li>
+    <li>Teaching and Education</li>
+    <li>Engineering and IT</li>
+    <li>Medical and Healthcare</li>
+</ul>
+<p>Jobs are updated daily. Apply before deadlines!</p>
+{% endblock %}
+
+{% block sort_options %}
+<a href="?{% if current_category %}category={{ current_category }}&{% endif %}sort=latest" 
+   class="sort-link {% if current_sort == 'latest' %}active{% endif %}">Latest</a>
+<a href="?{% if current_category %}category={{ current_category }}&{% endif %}sort=deadline" 
+   class="sort-link {% if current_sort == 'deadline' %}active{% endif %}">Deadline</a>
+<a href="?{% if current_category %}category={{ current_category }}&{% endif %}sort=popular" 
+   class="sort-link {% if current_sort == 'popular' %}active{% endif %}">Popular</a>
+{% endblock %}
+
+{% block table_headers %}
+<span>Job Details</span>
+<span>Deadline</span>
+<span>Organization</span>
+{% endblock %}
+
+{% block table_items %}
+{% for job in jobs %}
+<article class="blog-list-item" data-job-id="{{ job.id }}">                        
+    <div class="blog-list-content-wrap">
+        <h2 class="blog-list-title">
+            <a href="{{ job.get_absolute_url }}">{{ job.title }}</a>
+        </h2>
+        <p class="blog-list-excerpt">
+            {{ job.location }} • {{ job.job_type }} • {{ job.salary_range }}
+            {% if job.is_urgent %}
+            <span style="color: #f87171; font-weight: 600; margin-left: 0.5rem;">URGENT</span>
+            {% endif %}
+        </p>
+    </div>
+    
+    <span class="blog-list-date" style="{% if job.is_expiring_soon %}color: #f87171; font-weight: 600;{% endif %}">
+        {{ job.deadline|date:"M d, Y" }}
+    </span>
+    <span class="blog-list-category">{{ job.organization|default:"Govt" }}</span>
+</article>
+{% empty %}
+<div class="blog-empty">
+    <p>No active jobs found.</p>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block load_more %}
+{% if has_more_jobs %}
+<div class="load-more-container">
+    <button class="load-more-btn" id="loadMoreBtn" data-next-page="2" data-category="{{ current_category|default:'' }}" data-sort="{{ current_sort }}">
+        Load More Jobs
+    </button>
+</div>
+{% endif %}
+
+<script>
+const loadMoreBtn = document.getElementById('loadMoreBtn');
+const itemsList = document.getElementById('itemsList');
+
+if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', function() {
+        const btn = this;
+        const nextPage = btn.dataset.nextPage;
+        const category = btn.dataset.category;
+        const sort = btn.dataset.sort;
+        
+        btn.disabled = true;
+        btn.classList.add('loading');
+        btn.innerHTML = 'Loading...';
+        
+        let url = `?page=${nextPage}`;
+        if (category) url += `&category=${category}`;
+        if (sort && sort !== 'latest') url += `&sort=${sort}`;
+        
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newItems = doc.querySelectorAll('.blog-list-item');
+            
+            newItems.forEach(item => {
+                itemsList.appendChild(item.cloneNode(true));
+            });
+            
+            const hasMore = doc.querySelector('#loadMoreBtn');
+            if (hasMore) {
+                btn.dataset.nextPage = parseInt(nextPage) + 1;
+                btn.disabled = false;
+                btn.classList.remove('loading');
+                btn.innerHTML = 'Load More Jobs';
+            } else {
+                btn.remove();
+            }
+        })
+        .catch(error => {
+            btn.disabled = false;
+            btn.classList.remove('loading');
+            btn.innerHTML = 'Load More Jobs';
+        });
+    });
+}
+</script>
+{% endblock %}

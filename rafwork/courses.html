@@ -1,0 +1,20 @@
+{% extends 'website/base.html' %}
+
+{% block title %}Courses - TayariWeb{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>All Courses</h1>
+    <div class="grid">
+        {% for course in courses %}
+        <div class="card">
+            <h3>{{ course.title }}</h3>
+            <p>{{ course.description|truncatewords:30 }}</p>
+            <a href="{% url 'website:course_detail' course.slug %}">View Course</a>
+        </div>
+        {% empty %}
+        <p>No courses available.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

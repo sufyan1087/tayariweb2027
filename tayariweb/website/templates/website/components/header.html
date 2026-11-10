@@ -1,0 +1,439 @@
+{% load static %}
+<!-- 
+  TAYARIWEB — PRODUCTION GRADE NAVBAR COMPONENT
+  Updated: Custom Quiz prominent placement, ISSB/Jobs in actions, blinking highlight
+-->
+
+<!-- Skip Link -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- ============================================================
+     DESKTOP NAVBAR — Two Row Layout
+     ============================================================ -->
+<header class="tw-header" id="twHeader" role="banner" aria-label="Site header">
+  
+  <!-- ROW 1: Top Bar -->
+  <div class="tw-topbar">
+    <div class="tw-topbar-inner">
+      
+      <!-- Logo -->
+      <a href="{% url 'website:home' %}" class="tw-logo" aria-label="TayariWeb — Pakistan's Study Hub" id="siteTitle">
+        <span class="tw-logo-tayari">Tayari</span><span class="tw-logo-web">Web</span>
+      </a>
+      
+      <!-- Location Badge -->
+      <div class="tw-deliver" aria-label="Study resources for Pakistan">
+        <span class="tw-deliver-icon-wrap" aria-hidden="true">
+          <svg class="tw-deliver-icon" viewBox="0 0 24 24" fill="none" width="18" height="18">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z" fill="currentColor"/>
+          </svg>
+        </span>
+        <div class="tw-deliver-text">
+          <span class="tw-deliver-label">Study for</span>
+          <span class="tw-deliver-value">Pakistan 🇵🇰</span>
+        </div>
+      </div>
+      
+      <!-- Search Bar -->
+      <div class="tw-search-wrap">
+        <form class="tw-search" action="{% url 'website:search' %}" method="get" role="search" aria-label="Search TayariWeb">
+          <label for="search-category" class="visually-hidden">Search category</label>
+          <select id="search-category" class="tw-search-cat" name="category">
+            <option value="">All</option>
+            <option value="issb">ISSB</option>
+            
+            <option value="quiz">Quizzes</option>
+            <option value="jobs">Jobs</option>
+            <option value="scholarships">Scholarships</option>
+            <option value="courses">Courses</option>
+          </select>
+          <label for="search-input" class="visually-hidden">Search query</label>
+          <input
+            id="search-input"
+            type="search"
+            name="q"
+            class="tw-search-input"
+            placeholder="Search courses, quizzes, jobs…"
+            value="{{ request.GET.q|default:'' }}"
+            autocomplete="off"
+            spellcheck="false"
+            enterkeyhint="search"
+          >
+          <button type="submit" class="tw-search-btn" aria-label="Submit search">
+            <svg class="tw-btn-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" width="18" height="18">
+              <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.5"/>
+              <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+      
+      <!-- PROMINENT CUSTOM QUIZ BUTTON — Next to search, blinking border -->
+<a href="{% url 'custom_quiz:generator_by_slug' slug='css' %}" class="tw-custom-quiz-promo" aria-label="Create Custom Quiz - CSS">        <span class="tw-custom-quiz-icon" aria-hidden="true">✨</span>
+        <span class="tw-custom-quiz-text">
+          <span class="tw-custom-quiz-label">AI Quiz</span>
+          <span class="tw-custom-quiz-main">Custom Quiz</span>
+        </span>
+      </a>
+      
+      <!-- Right Actions — ISSB and Jobs Only -->
+      <div class="tw-actions">
+        
+        <!-- ISSB Dropdown -->
+        <div class="tw-action tw-dropdown-wrapper">
+          <button 
+            type="button" 
+            class="tw-action-btn tw-action-issb" 
+            aria-haspopup="true" 
+            aria-expanded="false"
+            aria-controls="issb-action-dropdown"
+            id="issb-action-trigger"
+          >
+            <span class="tw-action-label">Prepare</span>
+            <span class="tw-action-main">
+              ISSB
+              
+            </span>
+          </button>
+          
+        </div>
+        
+        <!-- Jobs Link -->
+        <a href="{% url 'website:jobs_list' %}" class="tw-action tw-action-jobs" aria-label="Government Jobs">
+          <span class="tw-action-label">Latest</span>
+          <span class="tw-action-main">Jobs</span>
+        </a>
+        
+        <!-- Cart/Bookmarks -->
+        <a href="#" class="tw-cart" aria-label="Bookmarks: 0 items saved">
+          <span class="tw-cart-icon-wrap" aria-hidden="true">
+            <svg class="tw-cart-icon" viewBox="0 0 24 24" fill="none" width="24" height="24">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="tw-cart-count" aria-label="0 saved items">0</span>
+          <span class="tw-cart-label">Saved</span>
+        </a>
+        
+      </div>
+    </div>
+  </div>
+  
+  <!-- ROW 2: Category Bar (Sticky) -->
+  <nav class="tw-catbar" id="twCatbar" aria-label="Main navigation">
+    <div class="tw-catbar-inner">
+      
+      <!-- All Categories Trigger -->
+      <button 
+        type="button" 
+        class="tw-all-btn" 
+        id="twAllBtn" 
+        aria-expanded="false" 
+        aria-controls="twMegaMenu"
+        aria-label="Open all categories menu"
+      >
+        <span class="tw-all-icon-wrap" aria-hidden="true">
+          <svg class="tw-hamburger-icon" viewBox="0 0 20 14" width="16" height="12">
+            <rect width="20" height="2" rx="1" fill="currentColor"/>
+            <rect y="6" width="20" height="2" rx="1" fill="currentColor"/>
+            <rect y="12" width="20" height="2" rx="1" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="tw-all-text">All</span>
+      </button>
+      
+      <!-- Navigation Links — Custom Quiz moved here with highlight -->
+      <ul class="tw-nav-list" role="menubar">
+        <li role="none">
+          <a href="{% url 'website:home' %}" class="tw-nav-link {% if request.path == '/' %}tw-nav-link--active{% endif %}" role="menuitem">Home</a>
+        </li>
+                
+        
+        <!-- ISSB Dropdown — Fixed for Desktop -->
+        <li class="tw-dropdown" role="none">
+          <button 
+            type="button"
+            class="tw-nav-link tw-dropdown-trigger" 
+            aria-haspopup="true" 
+            aria-expanded="false"
+            aria-controls="issb-nav-dropdown"
+            id="issb-nav-trigger"
+          >
+            <span class="tw-link-text">ISSB</span>
+            <svg class="tw-arrow-icon" viewBox="0 0 10 6" aria-hidden="true" width="10" height="6">
+              <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <ul class="tw-dropdown-menu" id="issb-nav-dropdown" role="menu" aria-labelledby="issb-nav-trigger" hidden>
+            <li role="none"><a href="#" class="tw-dropdown-item" role="menuitem">Interview Preparation</a></li>
+            <li role="none"><a href="#" class="tw-dropdown-item" role="menuitem">WAT Test</a></li>
+            <li role="none"><a href="#" class="tw-dropdown-item" role="menuitem">Psychological Test</a></li>
+            <li role="none"><a href="#" class="tw-dropdown-item" role="menuitem">GTO Tasks</a></li>
+          </ul>
+        </li>
+        
+        <li role="none"><a href="{% url 'quiz:quiz_list' %}" class="tw-nav-link {% if 'quiz' in request.path %}tw-nav-link--active{% endif %}" role="menuitem">Quizzes</a></li>
+        <li role="none"><a href="{% url 'website:jobs_list' %}" class="tw-nav-link {% if 'jobs' in request.path %}tw-nav-link--active{% endif %}" role="menuitem">Jobs</a></li>
+        <li role="none"><a href="{% url 'website:scholarships_list' %}" class="tw-nav-link {% if 'scholarships' in request.path %}tw-nav-link--active{% endif %}" role="menuitem">Scholarships</a></li>
+        <li role="none"><a href="{% url 'website:courses_list' %}" class="tw-nav-link {% if 'courses' in request.path %}tw-nav-link--active{% endif %}" role="menuitem">Free Courses</a></li>
+<li role="none">
+<a href="{% url 'custom_quiz:generator_by_slug' slug='css' %}" class="tw-custom-quiz-promo" aria-label="Create Custom Quiz - CSS">            <span class="tw-link-text">Custom Quiz</span>
+          </a>
+        </li>      </ul>
+      
+      <!-- Spacer for balance -->
+      <div class="tw-nav-spacer"></div>
+      
+    </div>
+    
+    <!-- Mega Menu -->
+    <div 
+      class="tw-mega-menu" 
+      id="twMegaMenu" 
+      aria-hidden="true" 
+      role="region" 
+      aria-label="All categories"
+      hidden
+    >
+      <div class="tw-mega-inner">
+        <div class="tw-mega-col">
+          <h3 class="tw-mega-heading">ISSB Prep</h3>
+          <ul role="list">
+            <li><a href="#" class="tw-mega-link">Interview Preparation</a></li>
+            <li><a href="#" class="tw-mega-link">WAT Test</a></li>
+            <li><a href="#" class="tw-mega-link">Psychological Test</a></li>
+            <li><a href="#" class="tw-mega-link">GTO Tasks</a></li>
+          </ul>
+        </div>
+        <div class="tw-mega-col">
+          <h3 class="tw-mega-heading">Quizzes</h3>
+          <ul role="list">
+            <li><a href="{% url 'quiz:quiz_list' %}" class="tw-mega-link">All Quizzes</a></li>
+<a href="{% url 'custom_quiz:generator_by_slug' slug='css' %}" class="tw-custom-quiz-promo" aria-label="Create Custom Quiz - CSS">          </ul>
+          <h3 class="tw-mega-heading" style="margin-top:1rem;">Jobs</h3>
+          <ul role="list">
+            <li><a href="{% url 'website:jobs_list' %}" class="tw-mega-link">Latest Jobs</a></li>
+          </ul>
+        </div>
+        <div class="tw-mega-col">
+          <h3 class="tw-mega-heading">Resources</h3>
+          <ul role="list">
+            <li><a href="{% url 'website:scholarships_list' %}" class="tw-mega-link">Scholarships</a></li>
+            <li><a href="{% url 'website:courses_list' %}" class="tw-mega-link">Free Courses</a></li>
+          </ul>
+        </div>
+        <div class="tw-mega-col">
+          <h3 class="tw-mega-heading">TayariWeb</h3>
+          <ul role="list">
+            <li><a href="{% url 'website:home' %}" class="tw-mega-link">Home</a></li>
+            <li><a href="{% url 'website:about' %}" class="tw-mega-link">About Us</a></li>
+            <li><a href="{% url 'website:contact' %}" class="tw-mega-link">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+  </nav>
+  
+</header>
+
+<!-- ============================================================
+     MOBILE NAVBAR — Fixed Top Bar + Slide-in Drawer
+     ============================================================ -->
+<div class="tw-mobile-bar" id="twMobileBar" role="banner" aria-label="Mobile navigation">
+  <div class="tw-mobile-bar-inner">
+    
+    <!-- Hamburger -->
+    <button
+      type="button"
+      class="tw-mob-ham"
+      id="twMobHam"
+      aria-label="Open menu"
+      aria-expanded="false"
+      aria-controls="twMobDrawer"
+    >
+      <span class="tw-ham-line-wrap" aria-hidden="true">
+        <span class="tw-ham-line"></span>
+        <span class="tw-ham-line"></span>
+        <span class="tw-ham-line"></span>
+      </span>
+    </button>
+    
+    <!-- Mobile Logo -->
+    <a href="{% url 'website:home' %}" class="tw-mob-logo" aria-label="TayariWeb Home">
+      <span class="tw-mob-logo-t">Tayari</span><span class="tw-mob-logo-w">Web</span>
+    </a>
+    
+    <!-- Mobile Search Toggle -->
+    <button 
+      type="button" 
+      class="tw-mob-search-btn" 
+      id="twMobSearchBtn" 
+      aria-label="Toggle search"
+      aria-expanded="false"
+      aria-controls="twMobSearchBar"
+    >
+      <svg class="tw-mob-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" width="20" height="20">
+        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.5"/>
+        <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+    
+  </div>
+  
+  <!-- Expandable Search Bar -->
+  <div 
+    class="tw-mob-search-bar" 
+    id="twMobSearchBar" 
+    aria-hidden="true"
+    hidden
+  >
+    <form action="{% url 'website:search' %}" method="get" role="search" aria-label="Mobile search">
+      <label for="mob-search-input" class="visually-hidden">Search</label>
+      <input 
+        id="mob-search-input"
+        type="search" 
+        name="q" 
+        placeholder="Search courses, quizzes…" 
+        value="{{ request.GET.q|default:'' }}"
+        autocomplete="off"
+        enterkeyhint="search"
+      >
+      <button type="submit" aria-label="Search">Go</button>
+    </form>
+  </div>
+</div>
+
+<!-- Mobile Backdrop -->
+<div 
+  class="tw-mob-backdrop" 
+  id="twMobBackdrop" 
+  aria-hidden="true"
+  hidden
+></div>
+
+<!-- Mobile Drawer -->
+<div 
+  class="tw-mob-drawer" 
+  id="twMobDrawer" 
+  aria-hidden="true" 
+  role="dialog" 
+  aria-modal="true" 
+  aria-label="Mobile menu"
+  hidden
+>
+  <div class="tw-mob-drawer-head">
+    <div class="tw-mob-drawer-logo" aria-label="TayariWeb">
+      <span>Tayari</span><span style="color:var(--color-accent-gold)">Web</span>
+    </div>
+    <button 
+      type="button" 
+      class="tw-mob-close" 
+      id="twMobClose" 
+      aria-label="Close menu"
+    >
+      <svg class="tw-mob-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" width="18" height="18">
+        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+  
+  <nav class="tw-mob-nav" aria-label="Mobile menu">
+    
+    <a href="{% url 'website:home' %}" class="tw-mob-item {% if request.path == '/' %}tw-mob-item--active{% endif %}">
+      <span class="tw-mob-item-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="tw-mob-item-text">Home</span>
+    </a>
+    
+    <!-- Custom Quiz Featured -->
+<a href="{% url 'custom_quiz:generator_by_slug' slug='css' %}" class="tw-custom-quiz-promo" aria-label="Create Custom Quiz - CSS">      <span class="tw-mob-item-icon tw-mob-featured-icon" aria-hidden="true">✨</span>
+      <span class="tw-mob-item-text">Custom Quiz</span>
+    </a>
+    
+    <!-- ISSB Accordion -->
+    <div class="tw-mob-accordion">
+      <button 
+        type="button" 
+        class="tw-mob-acc-toggle" 
+        aria-expanded="false" 
+        aria-controls="mobIssbMenu"
+        id="mob-issb-trigger"
+      >
+        <span class="tw-mob-acc-left">
+          <span class="tw-mob-item-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="tw-mob-item-text">ISSB</span>
+        </span>
+        <svg class="tw-mob-acc-arrow" viewBox="0 0 10 6" aria-hidden="true" width="10" height="6">
+          <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="tw-mob-acc-panel" id="mobIssbMenu" hidden>
+        <a href="#" class="tw-mob-subitem">Interview Preparation</a>
+        <a href="#" class="tw-mob-subitem">WAT Test</a>
+        <a href="#" class="tw-mob-subitem">Psychological Test</a>
+        <a href="#" class="tw-mob-subitem">GTO Tasks</a>
+      </div>
+    </div>
+    
+    <a href="{% url 'quiz:quiz_list' %}" class="tw-mob-item {% if 'quiz' in request.path %}tw-mob-item--active{% endif %}">
+      <span class="tw-mob-item-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="tw-mob-item-text">Quizzes</span>
+    </a>
+    
+    <a href="{% url 'website:jobs_list' %}" class="tw-mob-item {% if 'jobs' in request.path %}tw-mob-item--active{% endif %}">
+      <span class="tw-mob-item-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+          <rect x="2" y="7" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+          <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </span>
+      <span class="tw-mob-item-text">Jobs</span>
+    </a>
+    
+    <a href="{% url 'website:scholarships_list' %}" class="tw-mob-item {% if 'scholarships' in request.path %}tw-mob-item--active{% endif %}">
+      <span class="tw-mob-item-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M6 12v5c3 3 9 3 12 0v-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="tw-mob-item-text">Scholarships</span>
+    </a>
+    
+    <a href="{% url 'website:courses_list' %}" class="tw-mob-item {% if 'courses' in request.path %}tw-mob-item--active{% endif %}">
+      <span class="tw-mob-item-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </span>
+      <span class="tw-mob-item-text">Free Courses</span>
+    </a>
+     <!-- Custom Quiz Featured -->
+<a href="{% url 'custom_quiz:generator_by_slug' slug='css' %}" class="tw-custom-quiz-promo" aria-label="Create Custom Quiz - CSS">      <span class="tw-mob-item-icon tw-mob-featured-icon" aria-hidden="true">✨</span>
+      <span class="tw-mob-item-text">Custom Quiz</span>
+    </a>
+  
+  <div class="tw-mob-drawer-foot">
+    <p>© {% now "Y" %} TayariWeb — Pakistan's Study Hub</p>
+  </div>
+  
+</div>
+
+<!-- Mobile Spacer -->
+<div class="tw-mobile-spacer" aria-hidden="true"></div>

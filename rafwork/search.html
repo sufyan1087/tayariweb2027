@@ -1,0 +1,42 @@
+{% extends 'website/base.html' %}
+
+{% block title %}Search Results{% if query %} for "{{ query }}"{% endif %} | TayariWeb{% endblock %}
+
+{% block content %}
+<div class="main-wrapper" style="margin-top: 140px;">
+    <div class="main-container">
+        <main class="main-content" style="grid-column: 1 / -1;">
+            <h1 class="section-heading">
+                {% if query %}
+                    Search Results for "{{ query }}"
+                {% else %}
+                    Search Study Materials
+                {% endif %}
+            </h1>
+            
+            <form action="{% url 'website:search' %}" method="get" style="margin-bottom: 2rem;">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search..." 
+                       style="padding: 1rem; width: 100%; max-width: 500px; border-radius: 8px; border: 2px solid #e5e7eb;">
+                <button type="submit" style="padding: 1rem 2rem; background: #563d7c; color: white; border: none; border-radius: 8px; margin-left: 0.5rem;">Search</button>
+            </form>
+            
+            {% if query %}
+                <p>Found {{ total_results }} result{{ total_results|pluralize }}</p>
+                
+                <div class="cards-grid" style="margin-top: 1.5rem;">
+                    {% for post in posts %}
+                    <a href="{{ post.get_absolute_url }}" class="card">
+                        <div class="card-icon">📄</div>
+                        <h4 class="card-title">{{ post.title|truncatechars:40 }}</h4>
+                        <p class="card-desc">{{ post.excerpt|truncatechars:50 }}</p>
+                        <span class="card-meta">{{ post.category.name|default:"General" }}</span>
+                    </a>
+                    {% empty %}
+                    <p>No results found. Try different keywords.</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </main>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,211 @@
+{% extends 'website/dynamic/base.html' %}
+{% load static %}
+
+{% block title %}Search Results{% if query %} for "{{ query }}"{% endif %} | TayariWeb{% endblock %}
+
+{% block meta_description %}{% if query %}Search results for {{ query }} on TayariWeb. Find jobs, scholarships, courses, and study materials.{% else %}Search TayariWeb for CSS, PMS, ISSB preparation, government jobs, scholarships, and free courses.{% endif %}{% endblock %}
+
+{% block extra_css %}
+<link rel="preload" href="{% static 'website/css/search.css' %}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="{% static 'website/css/search.css' %}"></noscript>
+{% endblock %}
+
+{% block body_class %}search-page{% endblock %}
+
+{% block content %}
+<div class="search-page-wrapper">
+    <div class="search-container">
+        <div class="search-layout">
+            
+            <!-- Search Header -->
+            <div class="search-header">
+                <h1 class="search-title">
+                    {% if query %}
+                        Search Results for <span class="query-highlight">"{{ query }}"</span>
+                    {% else %}
+                        What are you looking for?
+                    {% endif %}
+                </h1>
+                {% if not query %}
+                    <p class="search-subtitle">Search through jobs, scholarships, courses, quizzes and study materials</p>
+                {% endif %}
+            </div>
+            
+            <!-- Search Form -->
+            <div class="search-form-container">
+                <form action="{% url 'website:search' %}" method="get" class="search-form" role="search">
+                    <div class="search-input-wrapper">
+                        <span class="search-icon" aria-hidden="true">🔍</span>
+                        <input 
+                            type="search" 
+                            name="q" 
+                            value="{{ query|default:'' }}" 
+                            placeholder="Search jobs, scholarships, courses..." 
+                            class="search-input"
+                            autocomplete="off"
+                            aria-label="Search keywords"
+                            {% if not query %}autofocus{% endif %}
+                        >
+                        {% if query %}
+                        <button type="button" class="search-clear" onclick="clearSearch()" aria-label="Clear search">✕</button>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="search-submit-btn">
+                        <span>Search</span>
+                        <span aria-hidden="true">→</span>
+                    </button>
+                </form>
+            </div>
+            
+            {% if query %}
+            <!-- Top Ad Banner -->
+            {% include 'website/components/ads/ad_unit.html' with type="horizontal" slot="search-top" %}
+            
+            <!-- Results Meta & Filters -->
+            <div class="search-meta-bar">
+                <div class="search-stats">
+                    Found <strong>{{ total_results|default:"0" }}</strong> result{{ total_results|pluralize }}
+                </div>
+                
+                <nav class="search-filters" aria-label="Filter by content type">
+                    <span style="font-size: 0.8rem; color: var(--text-light);">Filter:</span>
+                    <a href="?q={{ query|urlencode }}" class="filter-chip {% if not content_type %}active{% endif %}">All</a>
+                    <a href="?q={{ query|urlencode }}&type=jobs" class="filter-chip {% if content_type == 'jobs' %}active{% endif %}">Jobs</a>
+                    <a href="?q={{ query|urlencode }}&type=scholarships" class="filter-chip {% if content_type == 'scholarships' %}active{% endif %}">Scholarships</a>
+                    <a href="?q={{ query|urlencode }}&type=courses" class="filter-chip {% if content_type == 'courses' %}active{% endif %}">Courses</a>
+                    <a href="?q={{ query|urlencode }}&type=posts" class="filter-chip {% if content_type == 'posts' %}active{% endif %}">Materials</a>
+                </nav>
+            </div>
+            
+            <!-- Search Results -->
+            {% if posts %}
+            <div class="search-results-grid">
+                {% for post in posts %}
+                <article class="result-card">
+                    <a href="{{ post.get_absolute_url }}" class="result-card-link">
+                        <div class="result-card-header">
+                            <div class="result-icon" aria-hidden="true">
+                                {% if post.content_type == 'job' %}💼
+                                {% elif post.content_type == 'scholarship' %}🎓
+                                {% elif post.content_type == 'course' %}📹
+                                {% elif post.content_type == 'quiz' %}❓
+                                {% else %}📄{% endif %}
+                            </div>
+                            <div class="result-meta-top">
+                                <span class="result-category">{{ post.category.name|default:post.content_type|default:"General" }}</span>
+                                <time class="result-date" datetime="{{ post.created_at|date:'Y-m-d' }}">{{ post.created_at|date:"M d, Y" }}</time>
+                            </div>
+                        </div>
+                        
+                        <h2 class="result-title">{{ post.title|truncatechars:60 }}</h2>
+                        
+                        <p class="result-excerpt">{{ post.excerpt|truncatechars:120 }}</p>
+                        
+                        <div class="result-footer">
+                            <span class="result-type">
+                                {% if post.content_type == 'job' %}Full-time Position
+                                {% elif post.content_type == 'scholarship' %}Deadline: {{ post.deadline|date:"M d"|default:"Open" }}
+                                {% elif post.content_type == 'course' %}Free Course
+                                {% elif post.content_type == 'quiz' %}{{ post.question_count|default:"10" }} Questions
+                                {% else %}Article{% endif %}
+                            </span>
+                            <span class="result-action">View Details →</span>
+                        </div>
+                    </a>
+                </article>
+
+                {% if forloop.counter == 4 %}
+                    <!-- In-Feed Ad -->
+                    {% include 'website/components/ads/ad_unit.html' with type="in_feed" slot="search-in-feed" %}
+                {% endif %}
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if posts.has_other_pages %}
+            <nav class="search-pagination" aria-label="Search results pagination">
+                {% if posts.has_previous %}
+                    <a href="?q={{ query|urlencode }}&page={{ posts.previous_page_number }}" class="page-btn" aria-label="Previous page">←</a>
+                {% else %}
+                    <span class="page-btn" aria-disabled="true">←</span>
+                {% endif %}
+                
+                {% for num in posts.paginator.page_range %}
+                    {% if posts.number == num %}
+                        <span class="page-btn active" aria-current="page">{{ num }}</span>
+                    {% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
+                        <a href="?q={{ query|urlencode }}&page={{ num }}" class="page-btn">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if posts.has_next %}
+                    <a href="?q={{ query|urlencode }}&page={{ posts.next_page_number }}" class="page-btn" aria-label="Next page">→</a>
+                {% else %}
+                    <span class="page-btn" aria-disabled="true">→</span>
+                {% endif %}
+            </nav>
+            {% endif %}
+            
+            <!-- Bottom Ad -->
+            {% include 'website/components/ads/ad_unit.html' with type="horizontal" slot="search-bottom" %}
+            
+            {% else %}
+            <!-- Empty State -->
+            <div class="search-empty">
+                <div class="empty-icon" aria-hidden="true">🔍</div>
+                <h2 class="empty-title">No results found</h2>
+                <p class="empty-text">We couldn't find anything matching "{{ query }}". Try different keywords or check your spelling.</p>
+                
+                <div class="empty-suggestions">
+                    <span style="width: 100%; margin-bottom: 0.5rem; color: var(--text-light); font-size: 0.8rem;">Popular searches:</span>
+                    <a href="?q=ISSB" class="empty-suggestion">ISSB</a>
+                    <a href="?q=Army+Jobs" class="empty-suggestion">Army Jobs</a>
+                    <a href="?q=Navy" class="empty-suggestion">Navy</a>
+                    <a href="?q=Scholarships" class="empty-suggestion">Scholarships</a>
+                    <a href="?q=Free+Courses" class="empty-suggestion">Free Courses</a>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% else %}
+            <!-- Initial State -->
+            <div class="search-empty" style="border-style: solid; background: var(--bg);">
+                <div class="empty-icon" aria-hidden="true" style="opacity: 0.3;">💡</div>
+                <h2 class="empty-title">Start Your Search</h2>
+                <p class="empty-text">Enter keywords above to find jobs, scholarships, courses, and study materials.</p>
+                
+                <div class="empty-suggestions">
+                    <span style="width: 100%; margin-bottom: 0.5rem; color: var(--text-light); font-size: 0.8rem;">Try searching for:</span>
+                    <a href="?q=ISSB+Preparation" class="empty-suggestion">ISSB Preparation</a>
+                    <a href="?q=PAF+Jobs" class="empty-suggestion">PAF Jobs</a>
+                    <a href="?q=Fulbright" class="empty-suggestion">Fulbright</a>
+                    <a href="?q=CSS+Exam" class="empty-suggestion">CSS Exam</a>
+                    <a href="?q=Online+Courses" class="empty-suggestion">Online Courses</a>
+                </div>
+            </div>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function clearSearch() {
+    const input = document.querySelector('input[name="q"]');
+    if (input) {
+        input.value = '';
+        input.form.submit();
+    }
+}
+
+// Focus search input on load if no query
+{% if not query %}
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) searchInput.focus();
+});
+{% endif %}
+</script>
+{% endblock %}

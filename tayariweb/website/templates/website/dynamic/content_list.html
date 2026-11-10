@@ -1,0 +1,257 @@
+{% extends 'website/dynamic/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title|default:"Browse" }} - TayariWeb{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Browse latest opportunities on TayariWeb - Pakistan's premier education platform" }}{% endblock %}
+{% block canonical %}{{ request.build_absolute_uri }}{% endblock %}
+
+{% block og_type %}website{% endblock %}
+{% block og_title %}{{ page_title|default:"Browse Content" }} - TayariWeb{% endblock %}
+{% block og_description %}{{ meta_description|default:"Browse latest opportunities on TayariWeb" }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'website/css/content_list.css' %}">
+{% endblock %}
+
+{% block body_class %}content-list-page{% endblock %}
+
+{% block schema_org %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "{{ page_title|default:"Browse Content" }}",
+  "description": "{{ meta_description|default:"Browse latest opportunities" }}",
+  "url": "{{ request.build_absolute_uri }}",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "TayariWeb",
+    "url": "https://tayariweb.com"
+  },
+  "mainEntity": {
+    "@type": "ItemList",
+    "itemListElement": [
+      {% for item in items|slice:":10" %}
+      {
+        "@type": "ListItem",
+        "position": {{ forloop.counter }},
+        "name": "{{ item.title|escapejs }}",
+        "url": "https://tayariweb.com{{ item.get_absolute_url }}"
+      }{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ]
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="blog-page-wrapper">
+  
+  <!-- Top Banner Ad - High Value Placement -->
+  {% include 'website/components/ads/ad_unit.html' with type="horizontal_banner" slot="list-top-banner" %}
+  
+  <div class="blog-container">
+    
+    <!-- Sidebar - NO ADS, Internal SEO Focus -->
+    <aside class="blog-sidebar-left" aria-label="Filters and categories">
+      
+      <!-- Search -->
+      <div class="sidebar-widget search-widget">
+        <form action="{{ search_url|default:"/search/" }}" method="get" role="search">
+          <label for="sidebar-search" class="visually-hidden">Search {{ content_type_plural|default:"items" }}</label>
+          <input 
+            type="search" 
+            id="sidebar-search"
+            name="q" 
+            placeholder="Search {{ content_type_plural|default:"items" }}..." 
+            value="{{ request.GET.q|default:'' }}"
+            autocomplete="off"
+          >
+          <button type="submit">Search</button>
+        </form>
+      </div>
+      
+      <!-- Categories -->
+      <nav class="sidebar-widget categories-widget" aria-label="Category filters">
+        <h2 class="widget-title">Categories</h2>
+        <ul class="filter-list" role="list">
+          <li>
+            <a 
+              href="{{ base_url }}{% if current_sort and current_sort != default_sort %}?sort={{ current_sort }}{% endif %}" 
+              class="filter-link {% if not current_category %}active{% endif %}"
+              {% if not current_category %}aria-current="true"{% endif %}
+            >
+              All {{ content_type_plural|default:"Items" }}
+              <span class="count">{{ total_items }}</span>
+            </a>
+          </li>
+          {% for cat in categories %}
+          <li>
+            <a 
+              href="?category={{ cat.slug }}{% if current_sort and current_sort != default_sort %}&sort={{ current_sort }}{% endif %}" 
+              class="filter-link {% if current_category == cat.slug %}active{% endif %}"
+              {% if current_category == cat.slug %}aria-current="true"{% endif %}
+              title="{{ cat.count }} {{ content_type_plural|lower }} in {{ cat.name }}"
+            >
+              {{ cat.name }}
+              <span class="count">{{ cat.count }}</span>
+            </a>
+          </li>
+          {% empty %}
+          <li class="filter-empty">No categories available</li>
+          {% endfor %}
+        </ul>
+      </nav>
+      
+    </aside>
+
+    <!-- Main Content -->
+    <div class="blog-main">
+      
+      <!-- Header -->
+      <header class="content-header">
+        <h1>{{ page_title|default:"Browse Content" }}</h1>
+        <p class="blog-subtitle">{{ total_items }} {{ content_type_plural|lower|default:"items" }} available</p>
+        
+        {% if description_html %}
+        <div class="content-description">
+          {{ description_html|safe }}
+        </div>
+        {% endif %}
+      </header>
+      
+      <!-- Toolbar -->
+      <div class="blog-toolbar" role="toolbar" aria-label="Sort and filter options">
+        <div class="sort-wrapper" role="group" aria-label="Sort by">
+          <span class="sort-label">Sort:</span>
+          {% for sort_option in sort_options %}
+          <a 
+            href="?{% if current_category %}category={{ current_category }}&{% endif %}sort={{ sort_option.value }}" 
+            class="sort-link {% if current_sort == sort_option.value %}active{% endif %}"
+            {% if current_sort == sort_option.value %}aria-current="true"{% endif %}
+          >
+            {{ sort_option.label }}
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      
+      <!-- Content List -->
+      <div class="content-list" role="feed" aria-busy="false" aria-label="{{ content_type_plural|default:"Items" }} list" id="contentFeed">
+        
+        <!-- First Ad - After 3 items (optimal engagement) -->
+        {% for item in items %}
+        <article 
+          class="content-card" 
+          data-id="{{ item.id }}"
+          data-index="{{ forloop.counter }}"
+        >
+          <!-- Add image support -->
+          {% if item.thumbnail %}
+          <div class="content-card__image">
+            <img src="{{ item.thumbnail.url }}" alt="" loading="lazy" width="120" height="80">
+          </div>
+          {% endif %}
+          
+          <div class="content-card__content">
+            <div class="content-card__header">
+              <h2 class="content-card__title">
+                <a href="{{ item.get_absolute_url }}" rel="bookmark">
+                  {{ item.title }}
+                </a>
+              </h2>
+              {% if item.category %}
+              <span class="content-card__category">{{ item.category.name }}</span>
+              {% endif %}
+            </div>
+            
+            <div class="content-card__meta">
+              {% if item.published_date %}
+              <time datetime="{{ item.published_date|date:'Y-m-d' }}">
+                {{ item.published_date|date:"M d, Y" }}
+              </time>
+              {% endif %}
+              {% if item.location %}
+              <span class="content-card__meta-separator">•</span>
+              <span>{{ item.location }}</span>
+              {% endif %}
+            </div>
+            
+            <p class="content-card__excerpt">
+              {{ item.excerpt|truncatechars:150 }}
+            </p>
+            
+            {% if item.is_expiring_soon %}
+            <span class="content-card__urgent" role="alert">
+              <span aria-hidden="true">⏰</span>
+              Closing Soon
+            </span>
+            {% endif %}
+            
+            <div class="content-card__footer">
+              <span class="content-card__date">
+                {% if item.deadline %}
+                Deadline: {{ item.deadline|date:"M d, Y" }}
+                {% else %}
+                Posted {{ item.created_at|timesince }} ago
+                {% endif %}
+              </span>
+              <a href="{{ item.get_absolute_url }}" class="read-more-link">Read More →</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- In-Feed Native Ad - Strategic Placement -->
+        {% if forloop.counter == 3 or forloop.counter == 8 %}
+        {% include 'website/components/ads/ad_unit.html' with type="in_feed" slot="in-feed-strategic" %}
+        {% endif %}
+        
+        {% empty %}
+        <div class="content-empty" role="status">
+          <p>No {{ content_type_plural|lower|default:"items" }} found matching your criteria.</p>
+          <a href="{{ base_url }}" class="load-more-btn">Clear Filters</a>
+        </div>
+        {% endfor %}
+      </div>
+      
+      <!-- Pagination (SEO + No-JS Fallback) -->
+      {% if is_paginated %}
+      <nav class="pagination" role="navigation" aria-label="Pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}" class="pagination-link">← Previous</a>
+        {% endif %}
+        
+        <span class="pagination-current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}" class="pagination-link">Next →</a>
+        {% endif %}
+      </nav>
+      {% endif %}
+      
+      <!-- Load More (Progressive Enhancement) -->
+      {% if has_more %}
+      <div class="load-more-container">
+        <button 
+          class="load-more-btn" 
+          id="loadMoreBtn"
+          data-next-page="2"
+          data-category="{{ current_category|default:'' }}"
+          data-sort="{{ current_sort|default:'' }}"
+          data-content-type="{{ content_type|default:'content' }}"
+          aria-label="Load more {{ content_type_plural|default:'items' }}"
+        >
+          <span class="btn-text">Load More {{ content_type_plural|default:"Items" }}</span>
+        </button>
+        <div id="loadMoreStatus" role="status" aria-live="polite" class="visually-hidden"></div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'website/js/load-more.js' %}" defer></script>
+{% endblock %}

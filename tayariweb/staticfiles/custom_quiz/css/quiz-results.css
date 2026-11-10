@@ -1,0 +1,409 @@
+/* ============================================
+   TAYARIWEB QUIZ - RESULTS/REVIEW STAGE
+   Clean Analytics | Professional Presentation
+   ============================================ */
+
+/* ============================================
+   RESULTS SECTION
+   ============================================ */
+.results-section {
+  background: var(--bg-white);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-hover);
+  padding: var(--space-lg);
+}
+
+@media (min-width: 768px) {
+  .results-section {
+    padding: var(--space-xl);
+  }
+}
+
+/* ============================================
+   RESULTS HEADER
+   ============================================ */
+.results-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.results-header h2 {
+  font-size: 1.5rem;
+  color: var(--text-dark);
+  margin-bottom: var(--space-lg);
+  font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .results-header h2 {
+    font-size: 1.875rem;
+  }
+}
+
+/* Score Circle */
+.score-circle {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin: 0 auto var(--space-lg);
+}
+
+.score-ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ring-bg {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 10;
+}
+
+.ring-progress {
+  fill: none;
+  stroke: url(#scoreGradient);
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-dasharray: 283;
+  stroke-dashoffset: 283;
+  transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.score-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.score-percent {
+  display: block;
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  line-height: 1;
+}
+
+.score-label {
+  font-size: var(--font-xs);
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+/* Result Badge */
+.result-badge {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-lg);
+  border-radius: var(--radius-full);
+  font-size: var(--font-base);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-sm);
+}
+
+.result-badge.pass {
+  background: rgba(52, 211, 153, 0.15);
+  color: var(--accent-green);
+  border: 2px solid var(--accent-green);
+}
+
+.result-badge.fail {
+  background: rgba(248, 113, 113, 0.15);
+  color: var(--accent-coral);
+  border: 2px solid var(--accent-coral);
+}
+
+.result-message {
+  color: var(--text-light);
+  font-size: var(--font-base);
+}
+
+/* ============================================
+   STATS GRID
+   ============================================ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+}
+
+@media (min-width: 640px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.stat-box {
+  text-align: center;
+  padding: var(--space-md);
+  background: var(--bg-light);
+  border-radius: var(--radius-md);
+  border-top: 4px solid var(--border);
+  transition: transform var(--transition-fast);
+}
+
+.stat-box:hover {
+  transform: translateY(-2px);
+}
+
+.stat-box.correct { border-color: var(--accent-green); background: rgba(52, 211, 153, 0.1); }
+.stat-box.wrong { border-color: var(--accent-coral); background: rgba(248, 113, 113, 0.1); }
+.stat-box.skipped { border-color: var(--text-light); background: var(--bg-light); }
+.stat-box.time { border-color: var(--primary-color); background: var(--accent-color); }
+
+.stat-icon {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-xs);
+  display: block;
+}
+
+.stat-number {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.stat-label {
+  font-size: var(--font-xs);
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+/* ============================================
+   PERFORMANCE BREAKDOWN
+   ============================================ */
+.performance-breakdown {
+  margin: var(--space-xl) 0;
+  padding: var(--space-lg);
+  background: var(--bg-light);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.performance-breakdown h3 {
+  font-size: var(--font-base);
+  color: var(--text-dark);
+  margin-bottom: var(--space-md);
+  text-align: center;
+  font-weight: 600;
+}
+
+.breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+}
+
+@media (min-width: 640px) {
+  .breakdown-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.breakdown-item {
+  text-align: center;
+  padding: var(--space-sm);
+}
+
+.breakdown-value {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.breakdown-label {
+  font-size: var(--font-xs);
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================
+   REVIEW SECTION
+   ============================================ */
+.review-section {
+  margin-top: var(--space-xl);
+}
+
+.review-section h3 {
+  font-size: var(--font-base);
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: var(--space-md);
+  text-align: center;
+}
+
+/* Filter Buttons */
+.review-filters {
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.filter-btn {
+  padding: var(--space-xs) var(--space-md);
+  border: 2px solid var(--border);
+  background: var(--bg-white);
+  border-radius: var(--radius-full);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 36px;
+}
+
+.filter-btn:hover {
+  border-color: var(--primary-light);
+  background: var(--accent-color);
+}
+
+.filter-btn.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.filter-count {
+  font-size: 10px;
+  padding: 2px 6px;
+  background: rgba(255,255,255,0.2);
+  border-radius: var(--radius-full);
+  min-width: 1.25rem;
+  text-align: center;
+}
+
+/* Review List */
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.review-item {
+  padding: var(--space-md);
+  background: var(--bg-light);
+  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--border);
+  font-size: var(--font-sm);
+  transition: transform var(--transition-fast);
+}
+
+.review-item:hover {
+  transform: translateX(4px);
+}
+
+.review-item.correct { border-color: var(--accent-green); background: rgba(52, 211, 153, 0.1); }
+.review-item.wrong { border-color: var(--accent-coral); background: rgba(248, 113, 113, 0.1); }
+.review-item.skipped { border-color: var(--text-light); background: var(--bg-light); }
+
+.review-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-sm);
+  font-weight: 600;
+}
+
+.review-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.review-badge.correct { background: var(--accent-green); }
+.review-badge.wrong { background: var(--accent-coral); }
+.review-badge.skipped { background: var(--text-light); }
+
+.review-body {
+  line-height: 1.6;
+}
+
+.review-body p {
+  margin: var(--space-xs) 0;
+  color: var(--text-dark);
+}
+
+.review-body strong {
+  color: var(--text-dark);
+}
+
+.review-explanation {
+  margin-top: var(--space-sm);
+  padding: var(--space-sm);
+  background: rgba(255,255,255,0.6);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-xs);
+  color: var(--text-light);
+  border-left: 3px solid var(--primary-light);
+}
+
+/* ============================================
+   RESULTS ACTIONS
+   ============================================ */
+.results-actions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+  margin-top: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+.results-actions .btn {
+  min-width: 160px;
+}
+
+@media (max-width: 480px) {
+  .results-actions .btn {
+    width: 100%;
+  }
+}
+
+/* ============================================
+   RESULTS AD
+   ============================================ */
+.results-ad {
+  margin: var(--space-xl) 0;
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+@media print {
+  .results-actions,
+  .review-filters,
+  .results-ad,
+  .ad-container {
+    display: none !important;
+  }
+
+  .results-section {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+
+  .review-item {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

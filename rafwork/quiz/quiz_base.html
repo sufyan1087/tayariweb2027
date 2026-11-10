@@ -1,0 +1,21 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<!-- Preconnect to ad servers for performance -->
+<link rel="preconnect" href="https://pagead2.googlesyndication.com">
+<link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+
+<link rel="stylesheet" type="text/css" href="{% static 'quiz/css/quiz.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="quiz-system-container" role="main" aria-label="Quiz System">
+    {% block quiz_content %}{% endblock %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Defer non-critical JS -->
+<script src="{% static 'quiz/js/quiz.js' %}" defer></script>
+{% endblock %}

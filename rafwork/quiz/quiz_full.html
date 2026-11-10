@@ -1,0 +1,327 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}{{ quiz.title }} - Complete Practice Quiz with Solutions - TayariWeb{% endblock %}
+
+{% block extra_meta %}
+<meta name="description" content="Master {{ quiz.title }} with our comprehensive {{ total_questions }}-question practice test. {{ quiz.time_limit_minutes }}-minute timed assessment with detailed explanations.">
+<meta name="keywords" content="{{ quiz.title }}, {{ quiz.category }}, practice quiz, online test">
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'quiz/css/quiz_full.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<nav class="breadcrumb-wrap" aria-label="Breadcrumb">
+    <ol class="breadcrumb">
+        <li><a href="{% url 'website:home' %}">Home</a></li> /
+        <li><a href="{% url 'quiz:quiz_list' %}">Quizzes</a></li>/
+        <li><a href="#">{{ quiz.category }}</a></li>/
+        <li class="active">{{ quiz.title }}</li>
+    </ol>
+</nav>
+
+<!-- Top Ad Unit -->
+<div class="ad-wrap top-ad">
+    <div class="ad-label">Advertisement</div>
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+         data-ad-slot="TOP_AD_SLOT"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+</div>
+
+<div class="content-wrap">
+
+    <!-- MAIN CONTENT -->
+    <main class="main-area">
+
+        <!-- Article Content -->
+        <article class="article-block" id="articleBlock">
+            <header class="article-header">
+                <h1>{{ quiz.title }} - Comprehensive Practice Guide</h1>
+                <div class="article-meta">
+                    <span class="meta-cat">{{ quiz.category }}</span>
+                    <span class="meta-diff {{ quiz.difficulty }}">{{ quiz.get_difficulty_display }}</span>
+                    <span class="meta-date">Updated {{ quiz.updated_at|date:"F d, Y" }}</span>
+                </div>
+            </header>
+
+            <div class="article-body">
+                <p class="lead">{{ quiz.description }}</p>
+
+                <h2>What You'll Learn</h2>
+                <ul class="learn-list">
+                    <li>Master <strong>{{ total_questions }} carefully selected questions</strong></li>
+                    <li>Practice under <strong>{{ quiz.time_limit_minutes }}-minute timed conditions</strong></li>
+                    <li>Get <strong>instant detailed explanations</strong></li>
+                </ul>
+
+                <h2>Quiz Overview</h2>
+                <div class="overview-line">
+                    <span><strong>⏱️ {{ quiz.time_limit_minutes }}</strong> minutes</span>
+                    <span><strong>📝 {{ total_questions }}</strong> questions</span>
+                    <span><strong>🎯 {{ quiz.passing_percentage }}%</strong> passing</span>
+                    <span><strong>⭐ +{{ quiz.marks_per_correct }}</strong> marks/correct</span>
+                </div>
+
+                {% if quiz.quiz_type == 'negative' %}
+                <div class="alert-box">
+                    <strong>⚠️ Negative Marking:</strong> You will lose {{ quiz.marks_per_wrong }} marks for each wrong answer.
+                </div>
+                {% endif %}
+
+                <h2>Instructions</h2>
+                <ol class="steps-list">
+                    <li>Read each question carefully before selecting your answer</li>
+                    <li>Use number keys <strong>1-4</strong> to select options quickly</li>
+                    <li>Press <strong>Space</strong> to check your answer</li>
+                    <li>Navigate with <strong>arrow keys</strong> or click question numbers</li>
+                    <li>Bookmark difficult questions for later review</li>
+                </ol>
+            </div>
+        </article>
+
+        <!-- In-Content Ad -->
+        <div class="ad-wrap content-ad">
+            <div class="ad-label">Advertisement</div>
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                 data-ad-slot="CONTENT_AD"
+                 data-ad-format="auto"></ins>
+        </div>
+
+        <!-- QUIZ SECTION -->
+        <section class="quiz-block" id="quizBlock">
+            
+            <!-- Quiz Toolbar -->
+            <div class="quiz-toolbar">
+                <div class="toolbar-left">
+                    <span class="quiz-label">{{ quiz.title }}</span>
+                </div>
+                <div class="toolbar-right">
+                    <div class="timer-box" id="timerBox">
+                        <span class="timer-icon">⏱️</span>
+                        <span class="timer-digits" id="timerDigits">{{ quiz.time_limit_minutes }}:00</span>
+                    </div>
+                    <button class="tool-btn" onclick="quizApp.toggleFullscreen()" title="Fullscreen">⛶</button>
+                </div>
+            </div>
+
+            <!-- Question Jump Bar -->
+            <div class="jump-bar" id="jumpBar">
+                <span class="jump-label">Go to:</span>
+                <div class="jump-numbers" id="jumpNumbers"></div>
+            </div>
+
+            <!-- Question Area -->
+            <div class="question-wrap">
+                <div class="question-header">
+                    <span class="q-count" id="qCount">Question 1 of {{ total_questions }}</span>
+                    <div class="q-tools">
+                        <button class="tool-btn" onclick="quizApp.toggleBookmark()" id="bookmarkBtn" title="Bookmark">🔖</button>
+                    </div>
+                </div>
+
+                <div class="question-text" id="questionText"></div>
+
+                <div class="options-wrap" id="optionsWrap"></div>
+
+                <!-- Answer Reveal -->
+                <div class="reveal-box hidden" id="revealBox">
+                    <div class="reveal-status" id="revealStatus"></div>
+                    <div class="reveal-explain" id="revealExplain"></div>
+                </div>
+            </div>
+
+            <!-- Quiz Controls -->
+            <div class="control-bar">
+                <button class="ctrl-btn prev" id="prevBtn" onclick="quizApp.prevQuestion()" disabled>← Previous</button>
+                
+                <div class="ctrl-center">
+                    <button class="ctrl-btn check" id="checkBtn" onclick="quizApp.checkAnswer()">See Answer</button>
+                </div>
+
+                <button class="ctrl-btn next" id="nextBtn" onclick="quizApp.nextQuestion()">Next →</button>
+                <button class="ctrl-btn submit hidden" id="submitBtn" onclick="quizApp.submitQuiz()">Submit ✓</button>
+            </div>
+
+            <!-- Mid-Quiz Ad -->
+            <div class="mid-quiz-ad hidden" id="midQuizAd">
+                <button class="ad-close-btn" onclick="quizApp.closeMidAd()" title="Close ad">×</button>
+                <div class="ad-label">Advertisement</div>
+                <div class="ad-placeholder">
+                    <p>📢 Ad Space - Question <span id="adQNum">10</span></p>
+                    <small>Your AdSense code will go here</small>
+                </div>
+            </div>
+
+            <!-- Keyboard Help -->
+            <div class="key-help">
+                <span><kbd>1</kbd>-<kbd>4</kbd> Select</span>
+                <span><kbd>Space</kbd> Check</span>
+                <span><kbd>←</kbd> <kbd>→</kbd> Navigate</span>
+            </div>
+
+        </section>
+
+        <!-- RESULTS SECTION - Same container as quiz -->
+      <section class="results-block hidden" id="resultsBlock" aria-label="Quiz Results">
+  
+  <div class="results-top">
+    <h2>Quiz Complete</h2>
+    <div class="score-big" id="scoreBig">0%</div>
+    <div class="result-tag" id="resultTag">-</div>
+  </div>
+
+  <div class="stats-line">
+    <div class="stat-unit correct">
+      <span class="stat-num" id="statCorrect">0</span>
+      <span class="stat-name">Correct</span>
+    </div>
+    <div class="stat-unit wrong">
+      <span class="stat-num" id="statWrong">0</span>
+      <span class="stat-name">Wrong</span>
+    </div>
+    <div class="stat-unit skipped">
+      <span class="stat-num" id="statSkipped">0</span>
+      <span class="stat-name">Skipped</span>
+    </div>
+    <div class="stat-unit time">
+      <span class="stat-num" id="statTime">0:00</span>
+      <span class="stat-name">Time</span>
+    </div>
+  </div>
+
+  <!-- REVIEW SECTION - Card Layout -->
+  <div class="review-wrap">
+    <h3>Review Answers</h3>
+    
+    <div class="review-filters" role="group" aria-label="Filter results">
+      <button class="filter-tag active" onclick="quizApp.filterResults('all')">All</button>
+      <button class="filter-tag" onclick="quizApp.filterResults('correct')">✓ Correct</button>
+      <button class="filter-tag" onclick="quizApp.filterResults('wrong')">✗ Wrong</button>
+      <button class="filter-tag" onclick="quizApp.filterResults('skipped')">○ Skipped</button>
+    </div>
+    
+    <!-- Ad in review section -->
+    <div class="review-ad" data-ad-status="loading">
+      <div class="ad-label">Sponsored</div>
+      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="REVIEW_AD" data-ad-format="auto"></ins>
+    </div>
+    
+    <div class="review-list" id="reviewList">
+      <!-- JS injects cards here -->
+    </div>
+  </div>
+ 
+    <div class="fb">
+        <h4>Was this helpful?</h4>
+        <div class="fbb">
+          <button onclick="fd('like')">👍 Helpful</button>
+          <button onclick="fd('dislike')">👎 Not Helpful</button>
+        </div>
+      </div>
+
+
+  <div class="action-line">
+    <a href="{% url 'quiz:quiz_list' %}" class="action-btn outline">More Quizzes</a>
+    <button class="action-btn solid" onclick="location.reload()">Retake</button>
+  </div>
+
+</section>
+
+        <!-- Comments Section - Same container -->
+        <section class="comments-section" id="commentsBlock">
+            <h3 class="comments-title">💬 Discussion <span id="commentsCount">(0)</span></h3>
+            
+            <!-- Comment Form -->
+            <form class="comment-form" id="mainCommentForm">
+                <div class="comment-user-avatar" id="userAvatar">G</div>
+                <div class="comment-input-wrapper">
+                    <input type="text" id="guestNameInput" class="guest-name-field" placeholder="Your name" maxlength="50" required>
+                    <textarea id="commentText" class="comment-input" placeholder="Ask a question or share your thoughts..." maxlength="1000" required></textarea>
+                    <div class="comment-actions">
+                        <button type="submit" class="btn-comment-primary">Post Comment</button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Comments List -->
+            <div class="comments-list" id="commentsList"></div>
+        </section>
+
+    </main>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="sidebar-area">
+        
+        <!-- Popular Quizzes -->
+        <div class="side-section">
+            <h4 class="side-title">🔥 Popular Quizzes</h4>
+            <div class="side-list">
+                <a href="#" class="side-item">
+                    <span class="side-name">{{ quiz.title }}</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Sidebar Ad -->
+        <div class="side-section ad-side">
+            <div class="ad-label">Advertisement</div>
+            <div class="ad-box">
+                <ins class="adsbygoogle"
+                     style="display:inline-block;width:300px;height:250px"
+                     data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                     data-ad-slot="SIDEBAR_AD"></ins>
+            </div>
+        </div>
+
+        <!-- Related Categories -->
+        <div class="side-section">
+            <h4 class="side-title">📂 Categories</h4>
+            <div class="cat-list">
+                <a href="#" class="cat-item">
+                    <span class="cat-icon">📚</span>
+                    <span class="cat-name">{{ quiz.category }}</span>
+                    <span class="cat-num">5</span>
+                </a>
+            </div>
+        </div>
+
+    </aside>
+
+</div>  <!-- content-wrap closes here -->
+
+<!-- Quiz Data -->
+<script>
+window.quizData = {
+    id: {{ quiz.id }},
+    title: "{{ quiz.title|escapejs }}",
+    questions: {{ questions_json|safe }},
+    config: {
+        timeLimit: {{ time_limit_seconds }},
+        attemptId: {{ attempt_id|default:'null' }},
+        quizType: "{{ quiz.quiz_type|default:'simple' }}",
+        marksPerCorrect: {{ quiz.marks_per_correct|default:1 }},
+        marksPerWrong: {{ quiz.marks_per_wrong|default:0 }},
+        passingPercentage: {{ quiz.passing_percentage|default:60 }},
+        totalQuestions: {{ total_questions }}
+    }
+};
+function fd(t) {
+  fetch(`/quiz/api/feedback/{{ quiz.id }}/?type=${t}`);
+  event.target.textContent = 'Thanks!';
+}
+
+</script>
+
+<script src="{% static 'quiz/js/quiz_full.js' %}"></script>
+<script src="{% static 'quiz/js/comments.js' %}"></script>
+
+{% endblock %}

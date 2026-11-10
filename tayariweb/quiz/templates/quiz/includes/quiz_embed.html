@@ -1,0 +1,148 @@
+<!-- quiz/templates/quiz/includes/quiz_embed.html -->
+{% load static %}
+
+<div class="quiz-embed-wrapper" id="quiz-embed-{{ token }}" data-token="{{ token }}">
+    
+    <!-- Quiz Block - Your exact classes -->
+    <section class="quiz-block" id="quizBlock">
+        
+        <!-- Quiz Toolbar -->
+        <div class="quiz-toolbar">
+            <div class="toolbar-left">
+                <span class="quiz-label">{{ quiz.title }}</span>
+            </div>
+            <div class="toolbar-right">
+                <div class="timer-box" id="timerBox">
+                    <span class="timer-icon">⏱️</span>
+                    <span class="timer-digits" id="timerDigits">{{ quiz.time_limit_minutes }}:00</span>
+                </div>
+                <button class="tool-btn" onclick="quizApp.toggleFullscreen()" title="Fullscreen">⛶</button>
+            </div>
+        </div>
+
+        <!-- Question Jump Bar -->
+        <div class="jump-bar" id="jumpBar">
+            <span class="jump-label">Go to:</span>
+            <div class="jump-numbers" id="jumpNumbers"></div>
+        </div>
+
+        <!-- Question Area -->
+        <div class="question-wrap">
+            <div class="question-header">
+                <span class="q-count" id="qCount">Question 1 of {{ total_questions }}</span>
+                <div class="q-tools">
+                    <button class="tool-btn" onclick="quizApp.toggleBookmark()" id="bookmarkBtn" title="Bookmark">🔖</button>
+                </div>
+            </div>
+            <div class="question-text" id="questionText"></div>
+            <div class="options-wrap" id="optionsWrap"></div>
+            <div class="reveal-box hidden" id="revealBox">
+                <div class="reveal-status" id="revealStatus"></div>
+                <div class="reveal-explain" id="revealExplain"></div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="control-bar">
+            <button class="ctrl-btn prev" id="prevBtn" onclick="quizApp.prevQuestion()" disabled>← Previous</button>
+            <div class="ctrl-center">
+                <button class="ctrl-btn check" id="checkBtn" onclick="quizApp.checkAnswer()">See Answer</button>
+            </div>
+            <button class="ctrl-btn next" id="nextBtn" onclick="quizApp.nextQuestion()">Next →</button>
+            <button class="ctrl-btn submit hidden" id="submitBtn" onclick="quizApp.submitQuiz()">Submit ✓</button>
+        </div>
+
+        <!-- Mid-Quiz Ad -->
+        <div class="mid-quiz-ad hidden" id="midQuizAd">
+            <button class="ad-close-btn" onclick="quizApp.closeMidAd()" title="Close">×</button>
+            <div class="ad-label">Advertisement</div>
+            <div class="ad-placeholder">
+                <p>Ad Space</p>
+                <small>Question <span id="adQNum">10</span></small>
+            </div>
+        </div>
+
+        <!-- Keyboard Help -->
+        <div class="key-help">
+            <span><kbd>1</kbd>-<kbd>4</kbd> Select</span>
+            <span><kbd>Space</kbd> Check</span>
+            <span><kbd>←</kbd> <kbd>→</kbd> Navigate</span>
+        </div>
+    </section>
+
+    <!-- RESULTS SECTION - Hidden initially -->
+    <section class="results-block hidden" id="resultsBlock" aria-label="Quiz Results">
+        <div class="results-top">
+            <h2>Quiz Complete</h2>
+            <div class="score-big" id="scoreBig">0%</div>
+            <div class="result-tag" id="resultTag">-</div>
+        </div>
+
+        <div class="stats-line">
+            <div class="stat-unit correct"><span class="stat-num" id="statCorrect">0</span><span class="stat-name">Correct</span></div>
+            <div class="stat-unit wrong"><span class="stat-num" id="statWrong">0</span><span class="stat-name">Wrong</span></div>
+            <div class="stat-unit skipped"><span class="stat-num" id="statSkipped">0</span><span class="stat-name">Skipped</span></div>
+            <div class="stat-unit time"><span class="stat-num" id="statTime">0:00</span><span class="stat-name">Time</span></div>
+        </div>
+
+        <div class="review-wrap">
+            <h3>Review Answers</h3>
+            <div class="review-filters" role="group" aria-label="Filter results">
+                <button class="filter-tag active" onclick="quizApp.filterResults('all')">All</button>
+                <button class="filter-tag" onclick="quizApp.filterResults('correct')">✓ Correct</button>
+                <button class="filter-tag" onclick="quizApp.filterResults('wrong')">✗ Wrong</button>
+                <button class="filter-tag" onclick="quizApp.filterResults('skipped')">○ Skipped</button>
+            </div>
+            <div class="review-list" id="reviewList"></div>
+        </div>
+
+        <div class="fb">
+            <h4>Was this helpful?</h4>
+            <div class="fbb">
+                <button onclick="fd('like')">👍 Helpful</button>
+                <button onclick="fd('dislike')">👎 Not Helpful</button>
+            </div>
+        </div>
+
+        <div class="action-line">
+            <a href="{% url 'quiz:quiz_list' %}" class="action-btn outline">More Quizzes</a>
+            <button class="action-btn solid" onclick="location.reload()">Retake</button>
+        </div>
+    </section>
+
+</div>
+
+<script>
+// Initialize quiz data for this embed
+(function() {
+    window.quizData = {
+        id: {{ quiz.id }},
+        title: "{{ quiz.title|escapejs }}",
+        questions: {{ questions_json|safe }},
+        config: {
+            timeLimit: {{ time_limit_seconds }},
+            attemptId: null,
+            quizType: "{{ quiz.quiz_type|default:'simple' }}",
+            marksPerCorrect: {{ quiz.marks_per_correct|default:1 }},
+            marksPerWrong: {{ quiz.marks_per_wrong|default:0 }},
+            passingPercentage: {{ quiz.passing_percentage|default:60 }},
+            totalQuestions: {{ total_questions }}
+        }
+    };
+    
+    // Initialize quiz app when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            window.quizApp = new DirectQuiz();
+        });
+    } else {
+        window.quizApp = new DirectQuiz();
+    }
+})();
+
+// Feedback function
+function fd(t) {
+    fetch(`/quiz/api/feedback/{{ quiz.id }}/?type=${t}`);
+    event.target.textContent = 'Thanks!';
+}
+</script>

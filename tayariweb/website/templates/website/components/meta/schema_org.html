@@ -1,0 +1,47 @@
+{% load static %}
+<!-- Structured Data - Main Entity -->
+{% if seo.structured_data %}
+<script type="application/ld+json">
+{{ seo.structured_data|safe }}
+</script>
+{% else %}
+<!-- Default Website Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "TayariWeb",
+  "url": "{{ request.scheme }}://{{ request.get_host }}",
+  "description": "Access high-quality study notes and practice quizzes for exam preparation",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "{{ request.scheme }}://{{ request.get_host }}{% url 'website:search' %}?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+{% endif %}
+
+<!-- BreadcrumbList Schema -->
+{% if breadcrumb_json %}
+<script type="application/ld+json">
+{{ breadcrumb_json|safe }}
+</script>
+{% endif %}
+
+<!-- Organization Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "TayariWeb",
+  "url": "{{ request.scheme }}://{{ request.get_host }}",
+  "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'website/images/logo.png' %}",
+  "sameAs": [
+    "https://facebook.com/tayariweb",
+    "https://twitter.com/tayariweb",
+    "https://instagram.com/tayariweb",
+    "https://youtube.com/tayariweb"
+  ]
+}
+</script>

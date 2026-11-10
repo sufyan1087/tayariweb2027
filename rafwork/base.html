@@ -1,0 +1,152 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TayariWeb{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}TayariWeb - Access high-quality study notes and practice quizzes for exam preparation{% endblock %}">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'website/css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'website/css/home_page.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-top">
+            <a href="{% url 'website:home' %}" class="logo">
+                <span class="logo-tayari">Tayari</span><span class="logo-web">Web</span>
+            </a>
+            <div class="search-container">
+                <form action="{% url 'website:search' %}" method="get">
+                    <input type="text" name="q" class="search-input" placeholder="Search courses, notes..." value="{{ request.GET.q }}">
+                    <button type="submit" class="search-btn">Search</button>
+                </form>
+            </div>
+        </div>
+      <nav class="main-nav">
+    <ul class="nav-list">
+        <li><a href="{% url 'website:home' %}" class="nav-link {% if request.path == '/' %}active{% endif %}">Home</a></li>
+        
+        <!-- ISSB Dropdown -->
+        <li class="dropdown">
+            <a href="#" class="nav-link dropdown-toggle">
+                ISSB
+                <span class="dropdown-arrow">▼</span>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a href="#" class="dropdown-link">Interview</a></li>
+                <li><a href="#" class="dropdown-link">WAT Test</a></li>
+                <li><a href="#" class="dropdown-link">Psychological Test</a></li>
+                <li><a href="#" class="dropdown-link">GTO</a></li>
+            </ul>
+        </li>
+        
+        <li><a href="{% url 'quiz:quiz_list' %}" class="nav-link {% if 'quiz' in request.path %}active{% endif %}">Quizzes</a></li>
+        <li><a href="{% url 'website:jobs_list' %}" class="nav-link {% if 'jobs' in request.path %}active{% endif %}">Jobs</a></li>
+        
+        <!-- Custom Quiz - Always Active & Highlighted -->
+        <li>
+            <a href="{% url 'custom_quiz:quiz_generator' %}" class="nav-link nav-link-featured">
+                <span class="featured-icon">✨</span> Custom Quiz
+            </a>
+        </li>
+        
+        <li><a href="{% url 'website:scholarships_list' %}" class="nav-link {% if 'scholarships' in request.path %}active{% endif %}">Scholarships</a></li>
+        <li><a href="{% url 'website:courses_list' %}" class="nav-link {% if 'courses' in request.path %}active{% endif %}">Free Courses</a></li>
+        <li><a href="{% url 'website:about' %}" class="nav-link {% if 'about' in request.path %}active{% endif %}">About</a></li>
+        <li><a href="{% url 'website:contact' %}" class="nav-link {% if 'contact' in request.path %}active{% endif %}">Contact</a></li>
+    </ul>
+</nav>
+</header>
+
+    <!-- Main Content -->
+    <main class="main-content-wrapper">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4 class="footer-title">About Us</h4>
+                <p class="footer-desc">TayariWeb is a leading platform for competitive exam preparation, offering quality study materials and practice tests.</p>
+                <div class="newsletter-footer">
+                    <h5>Subscribe to our newsletter</h5>
+                    <form class="footer-form" action="{% url 'website:newsletter_subscribe' %}" method="post">
+                        {% csrf_token %}
+                        <input type="email" name="email" placeholder="Your email" required>
+                        <button type="submit">Join</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-title">Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="{% url 'website:home' %}">Home</a></li>
+                    <li><a href="{% url 'quiz:quiz_list' %}">Quizzes</a></li>
+                    <li><a href="{% url 'website:courses_list' %}">Free Courses</a></li>
+                    <li><a href="{% url 'website:scholarships_list' %}">Scholarships</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-title">Support</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQs</a></li>
+                    <li><a href="#">Sitemap</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-title">Legal</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                </ul>
+                <div class="footer-social">
+                    <a href="#" class="social-link" aria-label="Facebook">FB</a>
+                    <a href="#" class="social-link" aria-label="Twitter">TW</a>
+                    <a href="#" class="social-link" aria-label="Instagram">IG</a>
+                    <a href="#" class="social-link" aria-label="YouTube">YT</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p class="footer-bottom-content-p">&copy; {% now "Y" %} TayariWeb. All rights reserved.</p>
+                <div class="footer-page-links">
+                    <a href="#">About Us</a>
+                    <a href="#">Contact Us</a>
+                    <a href="#">Contact Us</a>
+                    <a href="#">Sitemap</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Menu -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- JavaScript -->
+    <script src="{% static 'website/js/main.js' %}"></script>
+    <script src="{% static 'website/js/post.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

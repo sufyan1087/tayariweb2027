@@ -1,0 +1,412 @@
+{% extends 'website/dynamic/base.html' %}
+{% load static %}
+
+{% block title %}{{ article.meta_title|default:article.title }} - TayariWeb{% endblock %}
+
+{% block meta_description %}{{ article.meta_description|default:article.excerpt|truncatewords:25 }}{% endblock %}
+
+{% block extra_head %}
+<!-- Open Graph -->
+<meta property="og:type" content="article">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:title" content="{{ article.title }}">
+<meta property="og:description" content="{{ article.excerpt|truncatewords:30 }}">
+{% if article.featured_image %}
+<meta property="og:image" content="{{ article.featured_image.url }}">
+{% endif %}
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="{{ request.build_absolute_uri }}">
+<meta property="twitter:title" content="{{ article.title }}">
+<meta property="twitter:description" content="{{ article.excerpt|truncatewords:30 }}">
+{% if article.featured_image %}
+<meta property="twitter:image" content="{{ article.featured_image.url }}">
+{% endif %}
+
+<!-- Canonical -->
+<link rel="canonical" href="{{ request.build_absolute_uri }}">
+
+<!-- Article Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "{{ article.title|escapejs }}",
+  "description": "{{ article.excerpt|escapejs }}",
+  "datePublished": "{{ article.published_at|date:'c' }}",
+  "dateModified": "{{ article.updated_at|date:'c' }}",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ request.build_absolute_uri }}"
+  }
+}
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'quiz/css/quiz_full.css' %}">
+<style>
+/* Article-specific overrides */
+.article-quiz-wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+}
+
+.article-header-compact {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+.article-header-compact h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+
+.article-meta-compact {
+    color: var(--text-light);
+    font-size: 0.875rem;
+}
+
+.article-intro {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--text-dark);
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--bg-light);
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color);
+}
+
+/* Quiz container styling */
+.quiz-article-container {
+    margin: 2rem 0;
+}
+
+/* Results appear below naturally */
+.results-block {
+    margin-top: 2rem;
+}
+
+/* Article content after quiz */
+.article-outro {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--border-color);
+    font-size: 1.05rem;
+    line-height: 1.7;
+}
+
+/* Share section */
+.quiz-share {
+    margin-top: 2rem;
+    text-align: center;
+    padding: 1.5rem;
+    background: var(--bg-light);
+    border-radius: 8px;
+}
+
+.quiz-share h4 {
+    margin-bottom: 1rem;
+    color: var(--primary-dark);
+}
+
+.share-btns {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.share-btns a,
+.share-btns button {
+    padding: 0.5rem 1.25rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.share-btn-tw { background: #1da1f2; color: white; }
+.share-btn-fb { background: #4267B2; color: white; }
+.share-btn-wa { background: #25d366; color: white; }
+.share-btn-copy { background: var(--primary-color); color: white; }
+
+.share-btns a:hover,
+.share-btns button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* Related quizzes */
+.related-quizzes {
+    margin-top: 2rem;
+}
+
+.related-quizzes h3 {
+    font-size: 1.25rem;
+    color: var(--primary-dark);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.related-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.related-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--bg-white);
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.related-item:hover {
+    border-color: var(--primary-color);
+    transform: translateX(4px);
+}
+
+.related-info h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.25rem;
+}
+
+.related-info span {
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .article-header-compact h1 {
+        font-size: 1.4rem;
+    }
+    
+    .article-intro {
+        font-size: 1rem;
+        padding: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="article-quiz-wrap">
+    
+    <!-- Article Header -->
+    <header class="article-header-compact">
+        <h1>{{ article.title }}</h1>
+        <div class="article-meta-compact">
+            <time datetime="{{ article.published_at|date:'c' }}">{{ article.published_at|date:"F d, Y" }}</time>
+            {% if article.category %}
+            <span> • {{ article.category.name }}</span>
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- Article Intro (Before Quiz) -->
+    {% if article.intro %}
+    <div class="article-intro">
+        {{ article.intro|safe }}
+    </div>
+    {% endif %}
+
+    <!-- QUIZ SECTION - Your existing structure, unchanged classes -->
+    <div class="quiz-article-container">
+        
+        <!-- Quiz Block -->
+        <section class="quiz-block" id="quizBlock">
+            
+            <!-- Quiz Toolbar -->
+            <div class="quiz-toolbar">
+                <div class="toolbar-left">
+                    <span class="quiz-label">{{ quiz.title }}</span>
+                </div>
+                <div class="toolbar-right">
+                    <div class="timer-box" id="timerBox">
+                        <span class="timer-icon">⏱️</span>
+                        <span class="timer-digits" id="timerDigits">{{ quiz.time_limit_minutes }}:00</span>
+                    </div>
+                    <button class="tool-btn" onclick="quizApp.toggleFullscreen()" title="Fullscreen">⛶</button>
+                </div>
+            </div>
+
+            <!-- Question Jump Bar -->
+            <div class="jump-bar" id="jumpBar">
+                <span class="jump-label">Go to:</span>
+                <div class="jump-numbers" id="jumpNumbers"></div>
+            </div>
+
+            <!-- Question Area -->
+            <div class="question-wrap">
+                <div class="question-header">
+                    <span class="q-count" id="qCount">Question 1 of {{ total_questions }}</span>
+                    <div class="q-tools">
+                        <button class="tool-btn" onclick="quizApp.toggleBookmark()" id="bookmarkBtn" title="Bookmark">🔖</button>
+                    </div>
+                </div>
+                <div class="question-text" id="questionText"></div>
+                <div class="options-wrap" id="optionsWrap"></div>
+                <div class="reveal-box hidden" id="revealBox">
+                    <div class="reveal-status" id="revealStatus"></div>
+                    <div class="reveal-explain" id="revealExplain"></div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="control-bar">
+                <button class="ctrl-btn prev" id="prevBtn" onclick="quizApp.prevQuestion()" disabled>← Previous</button>
+                <div class="ctrl-center">
+                    <button class="ctrl-btn check" id="checkBtn" onclick="quizApp.checkAnswer()">See Answer</button>
+                </div>
+                <button class="ctrl-btn next" id="nextBtn" onclick="quizApp.nextQuestion()">Next →</button>
+                <button class="ctrl-btn submit hidden" id="submitBtn" onclick="quizApp.submitQuiz()">Submit ✓</button>
+            </div>
+
+            <!-- Mid-Quiz Ad -->
+            <div class="mid-quiz-ad hidden" id="midQuizAd">
+                <button class="ad-close-btn" onclick="quizApp.closeMidAd()" title="Close">×</button>
+                {% include 'website/includes/adsense_ad.html' with ad_slot="MID_QUIZ_AD" ad_format="auto" %}
+            </div>
+
+            <!-- Keyboard Help -->
+            <div class="key-help">
+                <span><kbd>1</kbd>-<kbd>4</kbd> Select</span>
+                <span><kbd>Space</kbd> Check</span>
+                <span><kbd>←</kbd> <kbd>→</kbd> Navigate</span>
+            </div>
+        </section>
+
+        <!-- RESULTS SECTION - Hidden initially -->
+        <section class="results-block hidden" id="resultsBlock" aria-label="Quiz Results">
+            <div class="results-top">
+                <h2>Quiz Complete</h2>
+                <div class="score-big" id="scoreBig">0%</div>
+                <div class="result-tag" id="resultTag">-</div>
+            </div>
+
+            <div class="stats-line">
+                <div class="stat-unit correct"><span class="stat-num" id="statCorrect">0</span><span class="stat-name">Correct</span></div>
+                <div class="stat-unit wrong"><span class="stat-num" id="statWrong">0</span><span class="stat-name">Wrong</span></div>
+                <div class="stat-unit skipped"><span class="stat-num" id="statSkipped">0</span><span class="stat-name">Skipped</span></div>
+                <div class="stat-unit time"><span class="stat-num" id="statTime">0:00</span><span class="stat-name">Time</span></div>
+            </div>
+
+            <!-- Review Ad -->
+            {% include 'website/includes/adsense_ad.html' with ad_slot="REVIEW_AD" ad_format="auto" ad_class="review-ad" %}
+
+            <div class="review-wrap">
+                <h3>Review Answers</h3>
+                <div class="review-filters" role="group" aria-label="Filter results">
+                    <button class="filter-tag active" onclick="quizApp.filterResults('all')">All</button>
+                    <button class="filter-tag" onclick="quizApp.filterResults('correct')">✓ Correct</button>
+                    <button class="filter-tag" onclick="quizApp.filterResults('wrong')">✗ Wrong</button>
+                    <button class="filter-tag" onclick="quizApp.filterResults('skipped')">○ Skipped</button>
+                </div>
+                <div class="review-list" id="reviewList"></div>
+            </div>
+
+            <div class="fb">
+                <h4>Was this helpful?</h4>
+                <div class="fbb">
+                    <button onclick="fd('like')">👍 Helpful</button>
+                    <button onclick="fd('dislike')">👎 Not Helpful</button>
+                </div>
+            </div>
+
+            <div class="action-line">
+                <a href="{% url 'quiz:quiz_list' %}" class="action-btn outline">More Quizzes</a>
+                <button class="action-btn solid" onclick="location.reload()">Retake</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Article Outro (After Quiz) -->
+    {% if article.outro %}
+    <div class="article-outro">
+        {{ article.outro|safe }}
+    </div>
+    {% endif %}
+
+    <!-- Share Section -->
+    <div class="quiz-share">
+        <h4>Share This Quiz</h4>
+        <div class="share-btns">
+            <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ article.title|urlencode }}" 
+               target="_blank" rel="noopener" class="share-btn-tw">Twitter</a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}" 
+               target="_blank" rel="noopener" class="share-btn-fb">Facebook</a>
+            <a href="https://wa.me/?text={{ article.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}" 
+               target="_blank" rel="noopener" class="share-btn-wa">WhatsApp</a>
+            <button onclick="navigator.clipboard.writeText('{{ request.build_absolute_uri }}'); this.textContent='Copied!'; setTimeout(()=>this.textContent='Copy Link',2000)" 
+                    class="share-btn-copy">Copy Link</button>
+        </div>
+    </div>
+
+    <!-- Related Quizzes -->
+    {% if related_quizzes %}
+    <section class="related-quizzes">
+        <h3>More Quizzes Like This</h3>
+        <div class="related-list">
+            {% for related in related_quizzes|slice:":3" %}
+            <a href="{{ related.get_absolute_url }}" class="related-item">
+                <div class="related-info">
+                    <h4>{{ related.title }}</h4>
+                    <span>{{ related.question_count }} questions • {{ related.time_limit_minutes }} mins</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+</div>
+
+<!-- Quiz Data for JavaScript -->
+<script>
+window.quizData = {
+    id: {{ quiz.id }},
+    title: "{{ quiz.title|escapejs }}",
+    questions: {{ questions_json|safe }},
+    config: {
+        timeLimit: {{ time_limit_seconds }},
+        attemptId: {{ attempt_id|default:'null' }},
+        quizType: "{{ quiz.quiz_type|default:'simple' }}",
+        marksPerCorrect: {{ quiz.marks_per_correct|default:1 }},
+        marksPerWrong: {{ quiz.marks_per_wrong|default:0 }},
+        passingPercentage: {{ quiz.passing_percentage|default:60 }},
+        totalQuestions: {{ total_questions }}
+    }
+};
+
+// Feedback function for results section
+function fd(t) {
+    fetch(`/quiz/api/feedback/{{ quiz.id }}/?type=${t}`);
+    event.target.textContent = 'Thanks!';
+}
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'quiz/js/quiz_full.js' %}"></script>
+{% endblock %}

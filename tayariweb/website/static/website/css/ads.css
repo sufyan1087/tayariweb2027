@@ -1,0 +1,380 @@
+/* Base Ad Unit */
+.ad-unit {
+    position: relative;
+    background: var(--ad-bg);
+    border-radius: 12px;
+    margin: 1.5rem 0;
+    padding: 1rem;
+    contain: layout style;
+    transition: opacity 0.3s ease;
+}
+
+.ad-label {
+    position: absolute;
+    top: -8px;
+    left: 12px;
+    background: var(--ad-label-bg);
+    color: white;
+    font-size: 0.65rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    z-index: 10;
+    font-family: inherit;
+    line-height: 1;
+}
+
+.ad-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--ad-placeholder);
+    margin: 0 auto;
+    transition: background 0.3s ease;
+}
+
+/* Ad loaded state */
+.ad-unit[data-loaded="true"] .ad-container {
+    background: transparent;
+}
+
+.ad-unit[data-loaded="true"] .ad-fallback {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Fallback content */
+.ad-fallback {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary, #563d7c) 0%, var(--primary-dark, #322348) 100%);
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    transition: opacity 0.3s ease;
+}
+
+.ad-fallback span {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.ad-fallback small {
+    font-size: 0.75rem;
+    opacity: 0.9;
+}
+
+/* AdSense ins tag */
+.ad-container ins {
+    display: block;
+    z-index: 1;
+}
+
+/* ============================================
+   AD TYPE SPECIFIC STYLES
+   ============================================ */
+
+/* Sidebar Large - 300x600 */
+.ad-sidebar-large {
+    min-height: 620px;
+}
+
+.ad-sidebar-large .ad-container {
+    width: 300px;
+    height: 600px;
+}
+
+/* Sidebar Small - 300x250 */
+.ad-sidebar-small {
+    min-height: 270px;
+}
+
+.ad-sidebar-small .ad-container {
+    width: 300px;
+    height: 250px;
+}
+
+/* In-feed - Native style between content */
+.ad-in-feed {
+    background: var(--bg, #f8f7fa);
+    border-top: 1px solid var(--border, #e5e7eb);
+    border-bottom: 1px solid var(--border, #e5e7eb);
+    border-radius: 0;
+    margin: 1rem 0;
+    padding: 1rem;
+}
+
+.ad-in-feed .ad-container {
+    width: 100%;
+    min-height: 250px;
+    height: auto;
+}
+
+.ad-in-feed .ad-label {
+    background: var(--primary);
+}
+
+/* In-article - Fluid within content */
+.ad-in-article {
+    margin: 2rem 0;
+    padding: 1.5rem 0;
+    background: transparent;
+    border-radius: 0;
+}
+
+.ad-in-article .ad-container {
+    width: 100%;
+    min-height: 280px;
+    height: auto;
+}
+
+/* Horizontal - Leaderboard (Desktop only) */
+.ad-horizontal {
+    min-height: 110px;
+    display: none; /* Hidden by default, shown on desktop */
+}
+
+.ad-horizontal .ad-container {
+    width: 728px;
+    height: 90px;
+}
+
+/* Mobile Sticky - Fixed bottom */
+.ad-mobile-sticky {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0.5rem;
+    background: white;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+    z-index: 999;
+    display: none; /* Hidden by default, shown on mobile via media query */
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 0;
+    border-top: 1px solid var(--border);
+    min-height: 120px;
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+.ad-mobile-sticky .ad-container {
+    width: 320px;
+    height: 100px;
+    flex-shrink: 0;
+    border-radius: 4px;
+}
+
+.ad-mobile-sticky .ad-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: var(--text-light, #6b7280);
+    color: white;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    padding-bottom: 4px; /* Visual centering */
+}
+
+.ad-mobile-sticky .ad-close:hover {
+    background: var(--primary, #563d7c);
+    transform: scale(1.1);
+}
+
+/* Responsive - Auto size */
+.ad-responsive {
+    min-height: 270px;
+}
+
+.ad-responsive .ad-container {
+    width: 100%;
+    min-height: 250px;
+    height: auto;
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+/* Desktop Large (1025px+) - Show sidebar large */
+@media (min-width: 1025px) {
+    .ad-sidebar-large {
+        display: block;
+    }
+    
+    .ad-sidebar-small {
+        display: none;
+    }
+}
+
+/* Desktop (769px-1024px) - Show sidebar small, hide large */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .ad-sidebar-large {
+        display: none;
+    }
+    
+    .ad-sidebar-small {
+        display: block;
+    }
+    
+    .ad-horizontal {
+        display: block;
+    }
+}
+
+/* Tablet and Mobile (768px and below) */
+@media (max-width: 768px) {
+    .ad-sidebar-large,
+    .ad-sidebar-small,
+    .ad-horizontal {
+        display: none !important;
+    }
+    
+    .ad-mobile-sticky {
+        display: flex;
+    }
+    
+    /* Prevent content from being hidden behind sticky ad */
+    body {
+        padding-bottom: 120px; /* Reserve space for sticky ad */
+    }
+    
+    /* Adjust in-feed for mobile */
+    .ad-in-feed {
+        margin: 0.75rem 0;
+        padding: 0.75rem;
+    }
+    
+    .ad-in-article {
+        margin: 1.5rem 0;
+        padding: 1rem 0;
+    }
+    
+    /* Smaller fallback text on mobile */
+    .ad-fallback span {
+        font-size: 0.9rem;
+    }
+    
+    .ad-fallback small {
+        font-size: 0.7rem;
+    }
+}
+
+/* Desktop (769px+) - Hide mobile sticky */
+@media (min-width: 769px) {
+    .ad-mobile-sticky {
+        display: none !important;
+    }
+    
+    body {
+        padding-bottom: 0;
+    }
+    
+    .ad-horizontal {
+        display: block;
+    }
+}
+
+/* Small Mobile (480px and below) */
+@media (max-width: 480px) {
+    .ad-mobile-sticky .ad-container {
+        transform: scale(0.95);
+    }
+}
+
+/* ============================================
+   ACCESSIBILITY & MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .ad-unit,
+    .ad-container,
+    .ad-fallback,
+    .ad-close {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+@media (prefers-contrast: high) {
+    .ad-label {
+        background: #000 !important;
+        color: #fff !important;
+        border: 2px solid #fff;
+    }
+    
+    .ad-container {
+        border: 2px solid var(--text-light, #6b7280);
+    }
+    
+    .ad-fallback {
+        border: 2px solid #fff;
+    }
+}
+
+/* Print - Hide all ads */
+@media print {
+    .ad-unit,
+    .ad-mobile-sticky {
+        display: none !important;
+    }
+    
+    body {
+        padding-bottom: 0 !important;
+    }
+}
+
+/* ============================================
+   AD LOADING STATES
+   ============================================ */
+
+/* Loading state */
+.ad-unit[data-loaded="loading"] .ad-container {
+    background: linear-gradient(90deg, var(--ad-placeholder) 25%, #f9fafb 50%, var(--ad-placeholder) 75%);
+    background-size: 200% 100%;
+    animation: ad-loading 1.5s infinite;
+}
+
+@keyframes ad-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Error state */
+.ad-unit[data-loaded="error"] .ad-container {
+    background: #fef2f2;
+    border: 2px dashed #fecaca;
+}
+
+.ad-unit[data-loaded="error"] .ad-fallback {
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+}
+
+/* Success state */
+.ad-unit[data-loaded="true"] {
+    animation: ad-fade-in 0.3s ease;
+}
+
+@keyframes ad-fade-in {
+    from { opacity: 0.8; }
+    to { opacity: 1; }
+}

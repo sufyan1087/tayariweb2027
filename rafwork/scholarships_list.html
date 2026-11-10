@@ -1,0 +1,150 @@
+{% extends 'website/base_listing.html' %}
+{% load static %}
+
+{% block title %}Scholarships & Financial Aid - TayariWeb{% endblock %}
+{% block meta_description %}Find latest scholarships, financial aid, and funding opportunities for Pakistani and international students. Fully funded, partial scholarships, and grants.{% endblock %}
+
+{% block search_url %}{% url 'website:scholarships_search' %}{% endblock %}
+{% block search_placeholder %}Search scholarships...{% endblock %}
+
+{% block filter_title %}Scholarship Types{% endblock %}
+
+{% block filter_items %}
+<li>
+    <a href="{% url 'website:scholarships_list' %}" class="filter-link {% if not current_type %}active{% endif %}">
+        All Scholarships
+        <span class="count">{{ total_scholarships }}</span>
+    </a>
+</li>
+{% for type in scholarship_types %}
+<li>
+    <a href="?type={{ type.slug }}" class="filter-link {% if current_type == type.slug %}active{% endif %}">
+        {{ type.name }}
+        <span class="count">{{ type.scholarship_count }}</span>
+    </a>
+</li>
+{% endfor %}
+{% endblock %}
+
+{% block page_title %}Scholarships & Financial Aid{% endblock %}
+{% block page_subtitle %}{{ total_scholarships }} funding opportunities{% endblock %}
+
+{% block content_description %}
+<p>Discover scholarships to fund your education dreams. We curate opportunities from:</p>
+<ul>
+    <li><strong>Fully Funded:</strong> Tuition, living expenses, travel, and books covered</li>
+    <li><strong>Partial Scholarships:</strong> Tuition fee waivers and discounts</li>
+    <li><strong>Government Scholarships:</strong> HEC, provincial, and federal programs</li>
+    <li><strong>International:</strong> Fulbright, Erasmus, Commonwealth, and more</li>
+    <li><strong>University Specific:</strong> Merit-based and need-based aid</li>
+    <li><strong>Corporate Scholarships:</strong> Industry-sponsored programs</li>
+</ul>
+<p>Apply before deadlines. Check eligibility criteria carefully!</p>
+{% endblock %}
+
+{% block sort_options %}
+<a href="?{% if current_type %}type={{ current_type }}&{% endif %}sort=deadline" 
+   class="sort-link {% if current_sort == 'deadline' %}active{% endif %}">Deadline</a>
+<a href="?{% if current_type %}type={{ current_type }}&{% endif %}sort=latest" 
+   class="sort-link {% if current_sort == 'latest' %}active{% endif %}">Latest</a>
+<a href="?{% if current_type %}type={{ current_type }}&{% endif %}sort=amount" 
+   class="sort-link {% if current_sort == 'amount' %}active{% endif %}">Amount</a>
+{% endblock %}
+
+{% block table_headers %}
+<span>Scholarship Details</span>
+<span>Deadline</span>
+<span>Coverage</span>
+{% endblock %}
+
+{% block table_items %}
+{% for scholarship in scholarships %}
+<article class="blog-list-item" data-scholarship-id="{{ scholarship.id }}">                        
+    <div class="blog-list-content-wrap">
+        <h2 class="blog-list-title">
+            <a href="{{ scholarship.get_absolute_url }}">{{ scholarship.title }}</a>
+        </h2>
+        <p class="blog-list-excerpt">
+            {{ scholarship.provider }} • {{ scholarship.study_level }} • {{ scholarship.country }}
+            {% if scholarship.is_fully_funded %}
+            <span style="color: #10b981; font-weight: 600; margin-left: 0.5rem;">FULLY FUNDED</span>
+            {% endif %}
+        </p>
+    </div>
+    
+    <span class="blog-list-date" style="{% if scholarship.is_expiring_soon %}color: #f87171; font-weight: 600;{% endif %}">
+        {{ scholarship.deadline|date:"M d, Y" }}
+    </span>
+    <span class="blog-list-category">
+        {% if scholarship.is_fully_funded %}Full{% else %}{{ scholarship.coverage_percentage }}%{% endif %}
+    </span>
+</article>
+{% empty %}
+<div class="blog-empty">
+    <p>No active scholarships found.</p>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block load_more %}
+{% if has_more_scholarships %}
+<div class="load-more-container">
+    <button class="load-more-btn" id="loadMoreBtn" data-next-page="2" data-type="{{ current_type|default:'' }}" data-sort="{{ current_sort }}">
+        Load More Scholarships
+    </button>
+</div>
+{% endif %}
+
+<script>
+const loadMoreBtn = document.getElementById('loadMoreBtn');
+const itemsList = document.getElementById('itemsList');
+
+if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', function() {
+        const btn = this;
+        const nextPage = btn.dataset.nextPage;
+        const type = btn.dataset.type;
+        const sort = btn.dataset.sort;
+        
+        btn.disabled = true;
+        btn.classList.add('loading');
+        btn.innerHTML = 'Loading...';
+        
+        let url = `?page=${nextPage}`;
+        if (type) url += `&type=${type}`;
+        if (sort && sort !== 'deadline') url += `&sort=${sort}`;
+        
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newItems = doc.querySelectorAll('.blog-list-item');
+            
+            newItems.forEach(item => {
+                itemsList.appendChild(item.cloneNode(true));
+            });
+            
+            const hasMore = doc.querySelector('#loadMoreBtn');
+            if (hasMore) {
+                btn.dataset.nextPage = parseInt(nextPage) + 1;
+                btn.disabled = false;
+                btn.classList.remove('loading');
+                btn.innerHTML = 'Load More Scholarships';
+            } else {
+                btn.remove();
+            }
+        })
+        .catch(error => {
+            btn.disabled = false;
+            btn.classList.remove('loading');
+            btn.innerHTML = 'Load More Scholarships';
+        });
+    });
+}
+</script>
+{% endblock %}

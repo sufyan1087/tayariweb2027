@@ -1,0 +1,282 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} | TayariWeb{% endblock %}
+{% block meta_description %}{{ category.description|truncatechars:160 }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<div class="breadcrumb-wrapper">
+    <div class="breadcrumb">
+        <a href="{% url 'website:home' %}">Home</a>
+        <span class="separator">›</span>
+        <span class="current">{{ category.name }}</span>
+    </div>
+</div>
+
+<!-- Main Layout -->
+<div class="main-wrapper">
+    <div class="main-container category-layout">
+        
+        <!-- LEFT SIDEBAR -->
+        <div class="left-side">
+            
+            <!-- Category Info Box -->
+            <aside class="sidebar category-info-sidebar">
+                <div class="sidebar-box">
+                    <div class="category-icon-large" style="background: {{ category.color|default:'#563d7c' }}20; color: {{ category.color|default:'#563d7c' }};">
+                        {{ category.icon|default:"📚" }}
+                    </div>
+                    <h3 class="sidebar-title">{{ category.name }}</h3>
+                    <p class="category-stats">
+                        <span class="stat">📄 {{ total_posts }} Posts</span>
+                        <span class="stat">👁️ {{ total_views|default:"0" }} Views</span>
+                    </p>
+                    <p class="category-desc">{{ category.description }}</p>
+                </div>
+            </aside>
+
+            <!-- Quick Filters -->
+            <aside class="sidebar filter-sidebar">
+                <div class="sidebar-box">
+                    <h3 class="sidebar-title">🔍 Filter</h3>
+                    <div class="filter-options">
+                        <a href="?sort=latest" class="filter-link {% if request.GET.sort == 'latest' or not request.GET.sort %}active{% endif %}">📅 Latest</a>
+                        <a href="?sort=popular" class="filter-link {% if request.GET.sort == 'popular' %}active{% endif %}">🔥 Popular</a>
+                        <a href="?sort=oldest" class="filter-link {% if request.GET.sort == 'oldest' %}active{% endif %}">📆 Oldest</a>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Related Categories -->
+            {% if related_categories %}
+            <aside class="sidebar related-categories-sidebar">
+                <div class="sidebar-box">
+                    <h3 class="sidebar-title">📂 Related</h3>
+                    <ul class="related-cat-list">
+                        {% for cat in related_categories %}
+                        <li>
+                            <a href="{{ cat.get_absolute_url }}" class="related-cat-link">
+                                <span class="cat-icon">{{ cat.icon|default:"📁" }}</span>
+                                <span class="cat-name">{{ cat.name }}</span>
+                                <span class="cat-count">{{ cat.post_count }}</span>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </aside>
+            {% endif %}
+
+            <!-- Ad Section -->
+            {% if ad_left_1 %}
+            <div class="ad-section ad-left-1">
+                <div class="ad-label">Sponsored</div>
+                {{ ad_left_1.content|safe }}
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content category-content">
+            
+            <!-- Category Header -->
+            <div class="category-header">
+                <h1 class="category-title">
+                    <span class="cat-icon">{{ category.icon|default:"📚" }}</span>
+                    {{ category.name }}
+                </h1>
+                <p class="category-subtitle">{{ category.description }}</p>
+                
+                <!-- Sub Categories or Tags -->
+                {% if category.tags %}
+                <div class="category-tags">
+                    {% for tag in category.tags %}
+                    <span class="cat-tag">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Posts Grid -->
+            {% if posts %}
+            <div class="posts-grid modern-grid">
+                {% for post in posts %}
+                <article class="post-card modern-card">
+                    <div class="card-image-wrapper">
+                        {% if post.featured_image %}
+                        <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" loading="lazy">
+                        {% else %}
+                        <img src="{% static 'images/default-post.png' %}" alt="{{ post.title }}" loading="lazy">
+                        {% endif %}
+                        <div class="card-overlay">
+                            <span class="read-time">⏱️ {{ post.read_time|default:"5" }} min</span>
+                        </div>
+                        {% if post.post_type == 'guide' %}
+                        <span class="post-badge guide">📖 Guide</span>
+                        {% elif post.post_type == 'notes' %}
+                        <span class="post-badge notes">📝 Notes</span>
+                        {% elif post.post_type == 'previous_paper' %}
+                        <span class="post-badge paper">📄 Paper</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="post-card-content">
+                        <div class="card-meta-top">
+                            <span class="post-date">📅 {{ post.published_at|date:"M d, Y" }}</span>
+                            <span class="post-views">👁️ {{ post.views }}</span>
+                        </div>
+                        
+                        <h3 class="post-title">
+                            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                        </h3>
+                        
+                        <p class="post-excerpt">{{ post.excerpt|truncatechars:120 }}</p>
+                        
+                        <div class="card-meta-bottom">
+                            {% if post.author %}
+                            <div class="author-mini">
+                                {% if post.author.avatar %}
+                                <img src="{{ post.author.avatar.url }}" alt="{{ post.author }}" class="author-thumb">
+                                {% else %}
+                                <img src="{% static 'images/default-avatar.png' }}" alt="{{ post.author }}" class="author-thumb">
+                                {% endif %}
+                                <span class="author-name">{{ post.author|truncatechars:15 }}</span>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="post-stats">
+                                <span class="likes">❤️ {{ post.total_likes }}</span>
+                                <span class="comments">💬 {{ post.total_comments }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if posts.has_other_pages %}
+            <div class="pagination modern-pagination">
+                {% if posts.has_previous %}
+                <a href="?page={{ posts.previous_page_number }}" class="page-btn prev-btn">
+                    <span>←</span> Previous
+                </a>
+                {% else %}
+                <span class="page-btn prev-btn disabled"><span>←</span> Previous</span>
+                {% endif %}
+                
+                <div class="page-numbers">
+                    {% for num in posts.paginator.page_range %}
+                        {% if posts.number == num %}
+                        <span class="page-num active">{{ num }}</span>
+                        {% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
+                        <a href="?page={{ num }}" class="page-num">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                
+                {% if posts.has_next %}
+                <a href="?page={{ posts.next_page_number }}" class="page-btn next-btn">
+                    Next <span>→</span>
+                </a>
+                {% else %}
+                <span class="page-btn next-btn disabled">Next <span>→</span></span>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% else %}
+            <!-- Empty State -->
+            <div class="empty-state modern-empty">
+                <div class="empty-icon">📭</div>
+                <h2>No posts yet in {{ category.name }}</h2>
+                <p>We're working on adding great content to this category. Check back soon!</p>
+                <a href="{% url 'website:home' %}" class="btn-primary">Browse Other Categories</a>
+            </div>
+            {% endif %}
+
+        </main>
+
+        <!-- RIGHT SIDEBAR -->
+        <div class="right-side">
+            
+            <!-- Trending in Category -->
+            {% if trending_posts %}
+            <aside class="sidebar trending-sidebar">
+                <div class="sidebar-box">
+                    <h3 class="sidebar-title">🔥 Trending in {{ category.name }}</h3>
+                    <div class="trending-list">
+                        {% for post in trending_posts %}
+                        <a href="{{ post.get_absolute_url }}" class="trending-item">
+                            <span class="trending-rank">{{ forloop.counter }}</span>
+                            <div class="trending-info">
+                                <p class="trending-title">{{ post.title|truncatechars:40 }}</p>
+                                <span class="trending-meta">👁️ {{ post.views }} views</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </aside>
+            {% endif %}
+
+            <!-- Newsletter -->
+            <aside class="sidebar newsletter-sidebar">
+                <div class="sidebar-box">
+                    <h3 class="sidebar-title">📧 Stay Updated</h3>
+                    <p class="newsletter-desc">Get latest {{ category.name }} posts delivered to your inbox.</p>
+                    <form class="sidebar-newsletter-form" onsubmit="event.preventDefault(); subscribeNewsletter(this);">
+                        {% csrf_token %}
+                        <input type="email" name="email" placeholder="Your email" required>
+                        <button type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </aside>
+
+            <!-- Ad Section -->
+            {% if ad_right_1 %}
+            <div class="ad-section ad-right-1">
+                <div class="ad-label">Sponsored</div>
+                {{ ad_right_1.content|safe }}
+            </div>
+            {% endif %}
+
+            <!-- Popular Tags -->
+            {% if popular_tags %}
+            <aside class="sidebar tags-sidebar">
+                <div class="sidebar-box">
+                    <h3 class="sidebar-title">🏷️ Popular Tags</h3>
+                    <div class="tag-cloud">
+                        {% for tag in popular_tags %}
+                        <a href="#" class="tag-item" style="font-size: {{ tag.size }}em;">{{ tag.name }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </aside>
+            {% endif %}
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Newsletter subscribe
+function subscribeNewsletter(form) {
+    const formData = new FormData(form);
+    fetch('/api/newsletter/subscribe/', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message || data.error);
+        if (data.success) form.reset();
+    });
+}
+</script>
+{% endblock %}

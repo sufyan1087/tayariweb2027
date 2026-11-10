@@ -1,0 +1,46 @@
+{% extends 'website/dynamic/base.html' %}
+{% load static %}
+
+{% block title %}{{ quiz.title }} - Complete Practice Quiz with Solutions - TayariWeb{% endblock %}
+
+{% block extra_head %}
+<meta name="description" content="Master {{ quiz.title }} with our comprehensive {{ total_questions }}-question practice test. {{ quiz.time_limit_minutes }}-minute timed assessment with detailed explanations.">
+<meta name="keywords" content="{{ quiz.title }}, {{ quiz.category }}, practice quiz, online test">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Quiz",
+  "name": "{{ quiz.title|escapejs }}",
+  "description": "{{ quiz.description|escapejs }}",
+  "about": "{{ quiz.category|escapejs }}",
+  "educationalLevel": "{{ quiz.difficulty|escapejs }}",
+  "timeRequired": "PT{{ quiz.time_limit_minutes }}M"
+}
+</script>
+
+<link rel="stylesheet" href="{% static 'quiz/css/quiz_full.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Use Django's json_script filter - handles ALL escaping automatically -->
+{{ questions_json|json_script:"quiz-data" }}
+
+<!-- React Mount Point -->
+<div id="quiz-root" 
+     data-quiz-id="{{ quiz.id }}"
+     data-title="{{ quiz.title|escapejs }}"
+     data-description="{{ quiz.description|escapejs }}"
+     data-category="{{ quiz.category|escapejs }}"
+     data-difficulty="{{ quiz.difficulty|escapejs }}"
+     data-time-limit="{{ time_limit_seconds }}"
+     data-attempt-id="{{ attempt_id|default:'null' }}"
+     data-quiz-type="{{ quiz.quiz_type|default:'simple' }}"
+     data-marks-correct="{{ quiz.marks_per_correct|default:1 }}"
+     data-marks-wrong="{{ quiz.marks_per_wrong|default:0 }}"
+     data-passing="{{ quiz.passing_percentage|default:60 }}"
+     data-total-questions="{{ total_questions }}">
+</div>
+
+<script type="module" src="{% static 'js/bundles/quiz.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% load static %}
+<footer class="footer">
+    <div class="footer-content">
+        <!-- About -->
+        <div class="footer-section">
+            <h4 class="footer-title">About Us</h4>
+            <p class="footer-desc">TayariWeb is a leading platform for competitive exam preparation, offering quality study materials and practice tests.</p>
+            <div class="newsletter-footer">
+                <h5>Subscribe to our newsletter</h5>
+                <form class="footer-form" action="{% url 'website:newsletter_subscribe' %}" method="post">
+                    {% csrf_token %}
+                    <input type="email" name="email" placeholder="Your email" required>
+                    <button type="submit">Join</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-section">
+            <h4 class="footer-title">Quick Links</h4>
+            <ul class="footer-links">
+                <li><a href="{% url 'website:home' %}">Home</a></li>
+                <li><a href="{% url 'quiz:quiz_list' %}">Quizzes</a></li>
+                <li><a href="{% url 'website:courses_list' %}">Free Courses</a></li>
+                <li><a href="{% url 'website:scholarships_list' %}">Scholarships</a></li>
+            </ul>
+        </div>
+
+        <!-- Support -->
+        <div class="footer-section">
+            <h4 class="footer-title">Support</h4>
+            <ul class="footer-links">
+                <li><a href="#">Help Center</a></li>
+                <li><a href="{% url 'website:contact' %}">Contact Us</a></li>
+                <li><a href="#">FAQs</a></li>
+                <li><a href="#">Sitemap</a></li>
+            </ul>
+        </div>
+
+        <!-- Legal -->
+        <div class="footer-section">
+            <h4 class="footer-title">Legal</h4>
+            <ul class="footer-links">
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">Cookie Policy</a></li>
+            </ul>
+            <div class="footer-social">
+                <a href="#" class="social-link" aria-label="Facebook">FB</a>
+                <a href="#" class="social-link" aria-label="Twitter">TW</a>
+                <a href="#" class="social-link" aria-label="Instagram">IG</a>
+                <a href="#" class="social-link" aria-label="YouTube">YT</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <div class="footer-bottom-content">
+            <p>&copy; {% now "Y" %} TayariWeb. All rights reserved.</p>
+            <div class="footer-page-links">
+                <a href="{% url 'website:about' %}">About Us</a>
+                <a href="{% url 'website:contact' %}">Contact Us</a>
+                <a href="#">Sitemap</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms</a>
+            </div>
+        </div>
+    </div>
+</footer>

@@ -1,0 +1,66 @@
+{% extends 'website/base.html' %}
+
+{% block content %}
+<div class="blog-page-wrapper" role="main">
+    <div class="blog-container">
+        <!-- Left Sidebar -->
+        <aside class="blog-sidebar-left" role="complementary" aria-label="Filters and navigation">
+            <!-- Search -->
+            <div class="sidebar-widget search-widget">
+                <form action="{% block search_url %}/search/{% endblock %}" method="get" role="search">
+                    <input type="search" 
+                           name="q" 
+                           placeholder="{% block search_placeholder %}Search...{% endblock %}" 
+                           aria-label="Search content"
+                           value="{{ request.GET.q }}">
+                    <button type="submit" aria-label="Submit search">Search</button>
+                </form>
+            </div>
+            
+            <!-- Categories -->
+            <nav class="sidebar-widget categories-widget" aria-label="Category filters">
+                <h3 class="widget-title">{% block filter_title %}Categories{% endblock %}</h3>
+                <ul class="filter-list" role="list">
+                    {% block filter_items %}{% endblock %}
+                </ul>
+            </nav>
+            
+            <!-- Sidebar Ad -->
+            {% block sidebar_ad %}{% endblock %}
+        </aside>
+
+        <!-- Main Content -->
+        <main class="blog-main">
+            <!-- Header -->
+            <header class="content-area">
+                <h1>{% block page_title %}Content{% endblock %}</h1>
+                <p class="blog-subtitle">{% block page_subtitle %}{% endblock %}</p>
+                {% block content_description %}{% endblock %}
+            </header>
+            
+            <!-- Toolbar -->
+            <div class="blog-toolbar" role="toolbar" aria-label="Content controls">
+                {% block sort_options %}{% endblock %}
+            </div>
+            
+            <!-- Table/List -->
+            <div class="table-wrapper">
+                <div class="table-scroll" id="itemsList" role="region" aria-label="Content list" tabindex="0">
+                    <!-- Header -->
+                    <div class="blog-list-header" role="row">
+                        {% block table_headers %}{% endblock %}
+                    </div>
+                    
+                    <!-- Items -->
+                    <div class="blog-list" role="rowgroup">
+                        {% block table_items %}{% endblock %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Load More -->
+            {% block load_more %}{% endblock %}
+        </main>
+    </div>
+</div>
+{% endblock %}

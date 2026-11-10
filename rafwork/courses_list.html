@@ -1,0 +1,146 @@
+{% extends 'website/base_listing.html' %}
+{% load static %}
+
+{% block title %}Free Online Courses - TayariWeb{% endblock %}
+{% block meta_description %}Access free online courses, certifications, and MOOCs from top universities and platforms. Learn programming, data science, business, and more for free.{% endblock %}
+
+{% block search_url %}{% url 'website:courses_search' %}{% endblock %}
+{% block search_placeholder %}Search courses...{% endblock %}
+
+{% block filter_title %}Course Categories{% endblock %}
+
+{% block filter_items %}
+<li>
+    <a href="{% url 'website:courses_list' %}" class="filter-link {% if not current_category %}active{% endif %}">
+        All Courses
+        <span class="count">{{ total_courses }}</span>
+    </a>
+</li>
+{% for cat in course_categories %}
+<li>
+    <a href="?category={{ cat.slug }}" class="filter-link {% if current_category == cat.slug %}active{% endif %}">
+        {{ cat.name }}
+        <span class="count">{{ cat.course_count }}</span>
+    </a>
+</li>
+{% endfor %}
+{% endblock %}
+
+{% block page_title %}Free Online Courses{% endblock %}
+{% block page_subtitle %}{{ total_courses }} free learning opportunities{% endblock %}
+
+{% block content_description %}
+<p>Upgrade your skills with free courses from world-class universities and platforms:</p>
+<ul>
+    <li><strong>Programming & Tech:</strong> Python, JavaScript, AI, Data Science</li>
+    <li><strong>Business:</strong> Marketing, Finance, Project Management</li>
+    <li><strong>Academic:</strong> Mathematics, Sciences, Languages</li>
+    <li><strong>Test Prep:</strong> GRE, GMAT, IELTS, SAT preparation</li>
+    <li><strong>Professional:</strong> Communication, Leadership, Design</li>
+    <li><strong>Certifications:</strong> Google, Microsoft, AWS, Meta</li>
+</ul>
+<p>Most courses offer free certificates. Start learning today!</p>
+{% endblock %}
+
+{% block sort_options %}
+<a href="?{% if current_category %}category={{ current_category }}&{% endif %}sort=popular" 
+   class="sort-link {% if current_sort == 'popular' %}active{% endif %}">Popular</a>
+<a href="?{% if current_category %}category={{ current_category }}&{% endif %}sort=latest" 
+   class="sort-link {% if current_sort == 'latest' %}active{% endif %}">Latest</a>
+<a href="?{% if current_category %}category={{ current_category }}&{% endif %}sort=rating" 
+   class="sort-link {% if current_sort == 'rating' %}active{% endif %}">Top Rated</a>
+{% endblock %}
+
+{% block table_headers %}
+<span>Course Details</span>
+<span>Duration</span>
+<span>Platform</span>
+{% endblock %}
+
+{% block table_items %}
+{% for course in courses %}
+<article class="blog-list-item" data-course-id="{{ course.id }}">                        
+    <div class="blog-list-content-wrap">
+        <h2 class="blog-list-title">
+            <a href="{{ course.get_absolute_url }}">{{ course.title }}</a>
+        </h2>
+        <p class="blog-list-excerpt">
+            {{ course.instructor }} • {{ course.level }} • {{ course.students_enrolled }} students
+            {% if course.has_certificate %}
+            <span style="color: #10b981; font-weight: 600; margin-left: 0.5rem;">CERTIFICATE</span>
+            {% endif %}
+        </p>
+    </div>
+    
+    <span class="blog-list-date">{{ course.duration }}</span>
+    <span class="blog-list-category">{{ course.platform }}</span>
+</article>
+{% empty %}
+<div class="blog-empty">
+    <p>No courses found.</p>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block load_more %}
+{% if has_more_courses %}
+<div class="load-more-container">
+    <button class="load-more-btn" id="loadMoreBtn" data-next-page="2" data-category="{{ current_category|default:'' }}" data-sort="{{ current_sort }}">
+        Load More Courses
+    </button>
+</div>
+{% endif %}
+
+<script>
+const loadMoreBtn = document.getElementById('loadMoreBtn');
+const itemsList = document.getElementById('itemsList');
+
+if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', function() {
+        const btn = this;
+        const nextPage = btn.dataset.nextPage;
+        const category = btn.dataset.category;
+        const sort = btn.dataset.sort;
+        
+        btn.disabled = true;
+        btn.classList.add('loading');
+        btn.innerHTML = 'Loading...';
+        
+        let url = `?page=${nextPage}`;
+        if (category) url += `&category=${category}`;
+        if (sort && sort !== 'popular') url += `&sort=${sort}`;
+        
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newItems = doc.querySelectorAll('.blog-list-item');
+            
+            newItems.forEach(item => {
+                itemsList.appendChild(item.cloneNode(true));
+            });
+            
+            const hasMore = doc.querySelector('#loadMoreBtn');
+            if (hasMore) {
+                btn.dataset.nextPage = parseInt(nextPage) + 1;
+                btn.disabled = false;
+                btn.classList.remove('loading');
+                btn.innerHTML = 'Load More Courses';
+            } else {
+                btn.remove();
+            }
+        })
+        .catch(error => {
+            btn.disabled = false;
+            btn.classList.remove('loading');
+            btn.innerHTML = 'Load More Courses';
+        });
+    });
+}
+</script>
+{% endblock %}

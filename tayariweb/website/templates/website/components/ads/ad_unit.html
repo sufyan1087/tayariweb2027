@@ -1,0 +1,60 @@
+{% load static %}
+
+{% comment %} 
+Universal Ad Component - Simple Version
+Usage: {% include 'website/components/ads/ad_unit.html' with type="sidebar" slot="home-right" %}
+{% endcomment %}
+
+<div class="ad-unit 
+    {% if type == "sidebar" or type == "sidebar_300x600" %}ad-sidebar ad-sidebar-large
+    {% elif type == "sidebar_300x250" %}ad-sidebar ad-sidebar-small
+    {% elif type == "in_feed" or type == "native" %}ad-in-feed
+    {% elif type == "in_article" or type == "fluid" %}ad-in-article
+    {% elif type == "horizontal" or type == "after_content" %}ad-horizontal
+    {% elif type == "mobile_sticky" or type == "anchor" %}ad-mobile-sticky
+    {% else %}ad-auto{% endif %}"
+    
+    data-ad-slot="{{ slot|default:type|default:'default' }}"
+    
+    {% if type == "mobile_sticky" or sticky %}data-sticky="true"{% endif %}
+    
+    style="
+        {% if type == "sidebar" or type == "sidebar_300x600" %}min-height:600px;
+        {% elif type == "sidebar_300x250" %}min-height:250px;
+        {% elif type == "in_feed" %}min-height:250px;
+        {% elif type == "in_article" %}min-height:280px;
+        {% elif type == "horizontal" %}min-height:90px;
+        {% elif type == "mobile_sticky" %}min-height:100px;
+        {% else %}min-height:250px;{% endif %}
+        {{ custom_css|default:'' }}
+    ">
+    
+    <span class="ad-label">Advertisement</span>
+    
+    <div class="ad-container">
+        <ins class="adsbygoogle"
+             style="
+                {% if type == "sidebar" or type == "sidebar_300x600" %}display:inline-block;width:300px;height:600px
+                {% elif type == "sidebar_300x250" %}display:inline-block;width:300px;height:250px
+                {% elif type == "in_feed" %}display:block
+                {% elif type == "in_article" %}display:block;text-align:center
+                {% elif type == "horizontal" %}display:block
+                {% elif type == "mobile_sticky" %}display:inline-block;width:320px;height:100px
+                {% else %}display:block{% endif %}"
+             
+             data-ad-client="{{ client|default:'ca-pub-XXXXXXXXXXXXXXXX' }}"
+             data-ad-slot="{{ slot|default:'XXXXXXXXXX' }}"
+             
+             {% if type == "in_feed" %}data-ad-format="fluid" data-ad-layout-key="-fb+5w+4e-db+86" data-full-width-responsive="true"
+             {% elif type == "in_article" %}data-ad-format="fluid" data-ad-layout="in-article" data-full-width-responsive="true"
+             {% elif type == "horizontal" %}data-ad-format="auto" data-full-width-responsive="true"
+             {% elif type == "mobile_sticky" %}
+             {% else %}data-ad-format="auto" data-full-width-responsive="true"{% endif %}>
+        </ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+    
+    {% if type == "mobile_sticky" or sticky %}
+    <button class="ad-close" onclick="this.parentElement.style.display='none'" aria-label="Close ad">×</button>
+    {% endif %}
+</div>
